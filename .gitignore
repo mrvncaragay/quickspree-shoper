@@ -9,5 +9,10 @@ npm-debug.*
 *.orig.*
 web-build/
 
+config.js
+reference.js
+
 # macOS
 .DS_Store
+
+todo.txt
