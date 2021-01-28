@@ -27,8 +27,7 @@ const ProductItem = ({ product, onPress, done, replacement }) => {
 				}}
 			>
 				<CustomText label='Name'> {product?.productName}</CustomText>
-				<CustomText label='Aisle'> {product?.aisleName}</CustomText>
-				<CustomText label='Size'> {product?.size}</CustomText>
+				<CustomText label='Aisle'> {product?.aisleCode}</CustomText>
 				<CustomText label='Location'> {product?.memo}</CustomText>
 			</View>
 		</TouchableOpacity>

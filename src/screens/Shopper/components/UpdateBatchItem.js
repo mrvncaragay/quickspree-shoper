@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { View, StyleSheet } from 'react-native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
-import { TextInput, Button, IconButton, useTheme, Snackbar } from 'react-native-paper';
+import { TextInput, Button, useTheme, Snackbar } from 'react-native-paper';
 import { useStateValue } from '../../../context';
 import { StoreMap, BarCodeScanner } from '../../../components';
 import firebase from '../../../firebase';
@@ -51,8 +51,8 @@ const EditBatchItem = ({ navigation, route }) => {
 	};
 
 	const handleUpdate = async () => {
-		const productRef = firebase.database().ref(`batch/${store.name}-${store.storeNumber}/${product.id}`);
-		productRef.set(product, async (error) => {
+		const scannedProductRef = firebase.database().ref(`scanned/${product.id}`);
+		scannedProductRef.set(product, async (error) => {
 			if (error) {
 				console.log(error);
 			} else {
@@ -61,18 +61,18 @@ const EditBatchItem = ({ navigation, route }) => {
 		});
 	};
 
-	const handleReplacement = async () => {
-		try {
-			// Match, move this product in replacement
-			const batchRef = firebase.database().ref(`batch/${store.name}-${store.storeNumber}/${product.id}`);
-			const replacementRef = firebase.database().ref(`replacement/${product.id}`);
-			await replacementRef.set(product);
-			await batchRef.set(null);
-			navigation.goBack();
-		} catch (error) {
-			console.log(error.message);
-		}
-	};
+	// const handleReplacement = async () => {
+	// 	try {
+	// 		// Match, move this product in replacement
+	// 		const batchRef = firebase.database().ref(`batch/${store.name}-${store.storeNumber}/${product.id}`);
+	// 		const replacementRef = firebase.database().ref(`replacement/${product.id}`);
+	// 		await replacementRef.set(product);
+	// 		await batchRef.set(null);
+	// 		navigation.goBack();
+	// 	} catch (error) {
+	// 		console.log(error.message);
+	// 	}
+	// };
 
 	return !scan ? (
 		<>
@@ -81,7 +81,7 @@ const EditBatchItem = ({ navigation, route }) => {
 				resetScrollToCoords={{ x: 0, y: 0 }}
 				style={[styles.container, !store && { justifyContent: 'center', alignItems: 'center' }]}
 			>
-				<StoreMap store={store} product={product} handleLocation={handleLocation} isForm />
+				<StoreMap store={store} product={product} handleLocation={handleLocation} />
 
 				<View style={{ flex: 1, backgroundColor: 'white', paddingHorizontal: 20 }}>
 					<View
@@ -94,7 +94,7 @@ const EditBatchItem = ({ navigation, route }) => {
 						}}
 					>
 						{[
-							{ label: 'Aisle', value: 'aisle1' },
+							{ label: 'Aisle', value: 'aisle' },
 							{ label: 'Produce', value: 'produce' },
 							{ label: 'Dairy', value: 'dairy' },
 							{ label: 'Meat', value: 'meat' },
@@ -102,11 +102,12 @@ const EditBatchItem = ({ navigation, route }) => {
 							{ label: 'Bakery', value: 'bakery' },
 						].map((aisle, i) => (
 							<Button
-								mode={active.status && active.index === i ? 'contained' : 'outlined'}
+								disabled={product.aisleType !== aisle.value}
+								mode={product.aisleType === aisle.value ? 'contained' : 'outlined'}
 								dark
 								key={i}
 								compact
-								labelStyle={{ fontSize: 10, color: active.status && active.index === i ? 'white' : 'gray' }}
+								labelStyle={{ fontSize: 10, color: product.aisleType === aisle.value ? 'white' : 'gray' }}
 								onPress={() => {
 									if (product.aisleType === aisle.value) return;
 
@@ -131,33 +132,17 @@ const EditBatchItem = ({ navigation, route }) => {
 						onChangeText={(productName) => setProduct({ ...product, productName })}
 					/>
 					<TextInput
+						disabled={product.aisleCode && true}
 						style={styles.input}
 						mode='outlined'
 						dense
 						label='Aisle'
 						multiline
-						value={product?.aisleName || ''}
-						onChangeText={(aisleName) => setProduct({ ...product, aisleName })}
+						value={product?.aisleCode || ''}
+						onChangeText={(aisleCode) => setProduct({ ...product, aisleCode })}
 					/>
 
-					<View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-						<TextInput
-							style={[styles.input, { width: '85%' }]}
-							mode='outlined'
-							dense
-							label='upc...'
-							disabled
-							value={product.upc}
-						/>
-
-						<IconButton
-							style={{ position: 'relative', top: 5 }}
-							icon='barcode-scan'
-							size={30}
-							color={colors.primary}
-							onPress={() => setScan(true)}
-						/>
-					</View>
+					<TextInput style={styles.input} mode='outlined' dense label='upc...' disabled value={product.upc} />
 
 					<TextInput
 						style={styles.input}
@@ -186,14 +171,7 @@ const EditBatchItem = ({ navigation, route }) => {
 					>
 						Update
 					</Button>
-					<Button
-						labelStyle={{ textTransform: 'capitalize' }}
-						style={{ marginTop: 10, padding: 5, backgroundColor: 'darkorange' }}
-						mode='contained'
-						onPress={handleReplacement}
-					>
-						Need a replacement
-					</Button>
+
 					<Button
 						disabled={product.upc ? false : true}
 						labelStyle={{ textTransform: 'capitalize' }}
@@ -201,7 +179,7 @@ const EditBatchItem = ({ navigation, route }) => {
 						mode='contained'
 						onPress={() => setScan(true)}
 					>
-						Found Item
+						Save
 					</Button>
 				</View>
 			</KeyboardAwareScrollView>

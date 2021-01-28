@@ -27,6 +27,11 @@ export const StateReducer = (state, action) => {
 				...state,
 				scanned: action.value,
 			};
+		case 'setSaved':
+			return {
+				...state,
+				saved: action.value,
+			};
 		case 'isLoading':
 			return {
 				...state,
@@ -44,6 +49,7 @@ export const InitialState = {
 	done: [],
 	replacement: [],
 	scanned: [],
+	saved: [],
 	dimensions: {
 		width: Dimensions.get('window').width,
 		height: Dimensions.get('screen').height,

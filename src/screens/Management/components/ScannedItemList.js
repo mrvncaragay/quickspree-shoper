@@ -29,7 +29,7 @@ const ScannedItemList = ({ navigation }) => {
 			showsHorizontalScrollIndicator={true}
 			data={scanned}
 			renderItem={({ item }) => (
-				<ProductItem done product={item} onPress={() => navigation.navigate('UpdateBatch', { product: item })} />
+				<ProductItem product={item} onPress={() => navigation.navigate('UpdateBatch', { product: item })} />
 			)}
 			keyExtractor={(item) => item.id}
 			ItemSeparatorComponent={() => <Divider style={{ height: 10, backgroundColor: '#fff' }} />}

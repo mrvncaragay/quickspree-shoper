@@ -7,7 +7,7 @@ import firebase from '../../../firebase';
 
 const initialData = {
 	aisleType: 'aisle',
-	aisleName: '',
+	aisleCode: '',
 	location: {
 		x: 0,
 		y: 0,
@@ -118,8 +118,8 @@ const Scan = () => {
 							mode='outlined'
 							dense
 							label='Aisle code'
-							value={product.aisleName}
-							onChangeText={(aisleName) => setProduct({ ...product, aisleName })}
+							value={product.aisleCode}
+							onChangeText={(aisleCode) => setProduct({ ...product, aisleCode })}
 						/>
 
 						<View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
@@ -140,14 +140,6 @@ const Scan = () => {
 								onPress={() => setScan(true)}
 							/>
 						</View>
-						<TextInput
-							style={styles.input}
-							mode='outlined'
-							dense
-							label='Size'
-							value={product.size}
-							onChangeText={(size) => setProduct({ ...product, size })}
-						/>
 
 						<InlineButtons
 							containerStyle={{ justifyContent: 'flex-start' }}

@@ -1,13 +1,14 @@
 const productData = {
 	productName: '',
-	aisleType: '',
-	aisleName: '',
+	aisleType: 'aisle',
+	aisleCode: '',
 	location: {
-		x: 200,
-		y: 150,
+		x: 0,
+		y: 0,
 	},
 	upc: '',
 	size: '',
+	url: '',
 	memo: '',
 };
 
