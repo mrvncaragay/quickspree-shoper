@@ -4,9 +4,9 @@ import { useTheme, ActivityIndicator } from 'react-native-paper';
 import { Header as HeaderComponent, SelectStore } from '../../components';
 import { useStateValue } from '../../context';
 import { readData } from '../../utils/asyncStorage';
-import TopTabNavigator from '../../navigations/TopTabNavigator';
+import ShopperTopTabNavigator from '../../navigations/ShopperTopTabNavigator';
 
-const Batch = ({ navigation }) => {
+const Shopper = ({ navigation }) => {
 	const [{ store, isLoading }, dispatch] = useStateValue();
 	const { colors } = useTheme();
 
@@ -28,7 +28,7 @@ const Batch = ({ navigation }) => {
 			) : store ? (
 				<>
 					<HeaderComponent store={store} colors={colors} navigation={navigation} />
-					<TopTabNavigator />
+					<ShopperTopTabNavigator />
 				</>
 			) : (
 				<SelectStore colors={colors} navigation={navigation} />
@@ -47,4 +47,4 @@ const styles = StyleSheet.create({
 	},
 });
 
-export default Batch;
+export default Shopper;

@@ -1,7 +1,7 @@
 import React from 'react';
 import { useTheme } from 'react-native-paper';
 import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
-import { BatchItemList, DoneItemList, ReplacementItemList } from '../screens/Batch/components';
+import { BatchItemList, DoneItemList, ReplacementItemList } from '../screens/Shopper/components';
 import { useStateValue } from '../context';
 
 const Tab = createMaterialTopTabNavigator();
