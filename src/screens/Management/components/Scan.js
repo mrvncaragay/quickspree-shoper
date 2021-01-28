@@ -1,7 +1,7 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { View, StyleSheet } from 'react-native';
-import { Divider, useTheme, TextInput, Button, IconButton, Caption } from 'react-native-paper';
-import { ProductItem, BarCodeScanner, StoreMap } from '../../../components';
+import { useTheme, TextInput, Button, IconButton, Caption } from 'react-native-paper';
+import { BarCodeScanner, StoreMap } from '../../../components';
 import { useStateValue } from '../../../context';
 import firebase from '../../../firebase';
 
@@ -78,16 +78,24 @@ const InlineButtons = ({ label = '', data, setData, product, type, containerStyl
 	);
 };
 
-const Scan = ({ navigation }) => {
-	const [{ store, batch }, dispatch] = useStateValue();
+const Scan = () => {
+	const [{ store }] = useStateValue();
 	const [product, setProduct] = useState(initialData);
 	const [scan, setScan] = useState(false);
 
 	const { colors } = useTheme();
 
 	const handleBarcodeScan = async (info) => {
-		console.log(info.data);
-		setScan(false);
+		const productRef = firebase.database().ref('scanned');
+
+		productRef.push().set({ ...product, upc: info.data }, async (error) => {
+			if (error) {
+				console.log(error);
+			} else {
+				setProduct(initialData);
+				setScan(false);
+			}
+		});
 	};
 
 	const handleLocation = (coord) => {
@@ -132,6 +140,14 @@ const Scan = ({ navigation }) => {
 								onPress={() => setScan(true)}
 							/>
 						</View>
+						<TextInput
+							style={styles.input}
+							mode='outlined'
+							dense
+							label='Size'
+							value={product.size}
+							onChangeText={(size) => setProduct({ ...product, size })}
+						/>
 
 						<InlineButtons
 							containerStyle={{ justifyContent: 'flex-start' }}

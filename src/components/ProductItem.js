@@ -8,7 +8,7 @@ const ProductItem = ({ product, onPress, done, replacement }) => {
 	const CustomText = ({ label, children }) => {
 		return (
 			<View style={{ flexDirection: 'row', flexWrap: 'wrap', marginVertical: 1 }}>
-				<Text style={{ color: colors.backdrop, width: 45 }}>{label}:</Text>
+				<Text style={{ color: colors.backdrop }}>{label}:</Text>
 				<Text style={{ flex: 1, color: colors.primary }}>{children}</Text>
 			</View>
 		);
@@ -26,9 +26,10 @@ const ProductItem = ({ product, onPress, done, replacement }) => {
 					borderColor: done ? 'green' : replacement ? 'orange' : 'gray',
 				}}
 			>
-				<CustomText label='Name'>{product?.productName}</CustomText>
-				<CustomText label='Aisle'>{product?.aisleName}</CustomText>
-				<CustomText label='Size'>{product?.size}</CustomText>
+				<CustomText label='Name'> {product?.productName}</CustomText>
+				<CustomText label='Aisle'> {product?.aisleName}</CustomText>
+				<CustomText label='Size'> {product?.size}</CustomText>
+				<CustomText label='Location'> {product?.memo}</CustomText>
 			</View>
 		</TouchableOpacity>
 	);

@@ -22,6 +22,11 @@ export const StateReducer = (state, action) => {
 				...state,
 				replacement: action.value,
 			};
+		case 'setScanned':
+			return {
+				...state,
+				scanned: action.value,
+			};
 		case 'isLoading':
 			return {
 				...state,
@@ -38,6 +43,7 @@ export const InitialState = {
 	batch: [],
 	done: [],
 	replacement: [],
+	scanned: [],
 	dimensions: {
 		width: Dimensions.get('window').width,
 		height: Dimensions.get('screen').height,

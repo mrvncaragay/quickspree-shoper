@@ -5,20 +5,20 @@ import { ProductItem } from '../../../components';
 import { useStateValue } from '../../../context';
 import firebase from '../../../firebase';
 
-const DoneItemList = ({ navigation }) => {
-	const [{ done }, dispatch] = useStateValue();
+const ScannedItemList = ({ navigation }) => {
+	const [{ scanned }, dispatch] = useStateValue();
 
 	useEffect(() => {
-		const doneRef = firebase.database().ref(`done`);
-		doneRef.on('value', (snapshot) => {
+		const scannedRef = firebase.database().ref(`scanned`);
+		scannedRef.on('value', (snapshot) => {
 			const dbBatches = snapshot.val();
-			const doneState = [];
+			const scannedeState = [];
 
 			for (let key in dbBatches) {
-				doneState.push({ id: key, ...dbBatches[key] });
+				scannedeState.push({ id: key, ...dbBatches[key] });
 			}
 
-			dispatch({ type: 'setDone', value: doneState });
+			dispatch({ type: 'setScanned', value: scannedeState });
 		});
 	}, []);
 
@@ -27,7 +27,7 @@ const DoneItemList = ({ navigation }) => {
 			style={{ paddingHorizontal: 20, paddingTop: 10 }}
 			contentContainerStyle={{ paddingBottom: 15 }}
 			showsHorizontalScrollIndicator={true}
-			data={done}
+			data={scanned}
 			renderItem={({ item }) => (
 				<ProductItem done product={item} onPress={() => navigation.navigate('UpdateBatch', { product: item })} />
 			)}
@@ -37,4 +37,4 @@ const DoneItemList = ({ navigation }) => {
 	);
 };
 
-export default DoneItemList;
+export default ScannedItemList;
