@@ -93,9 +93,10 @@ const Scan = () => {
 				console.log(error);
 			} else {
 				setProduct(initialData);
-				setScan(false);
 			}
 		});
+
+		setScan(false);
 	};
 
 	const handleLocation = (coord) => {

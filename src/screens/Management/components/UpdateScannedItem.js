@@ -35,6 +35,12 @@ const UpdateScannedItem = ({ navigation, route }) => {
 		});
 	};
 
+	const handleDelete = async () => {
+		const scannedProductRef = firebase.database().ref(`scanned/${product.id}`);
+		await scannedProductRef.set(null);
+		navigation.goBack();
+	};
+
 	return (
 		<>
 			<KeyboardAwareScrollView
@@ -127,6 +133,15 @@ const UpdateScannedItem = ({ navigation, route }) => {
 						onPress={handleUpdate}
 					>
 						Update
+					</Button>
+
+					<Button
+						labelStyle={{ textTransform: 'capitalize' }}
+						style={{ marginTop: 10, padding: 5, backgroundColor: product.upc ? 'darkorange' : colors.disabled }}
+						mode='contained'
+						onPress={handleDelete}
+					>
+						Delete
 					</Button>
 
 					<Button
