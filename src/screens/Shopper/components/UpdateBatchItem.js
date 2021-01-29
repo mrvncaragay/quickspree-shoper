@@ -3,7 +3,7 @@ import { View, StyleSheet } from 'react-native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import { TextInput, Button, useTheme, Snackbar } from 'react-native-paper';
 import { useStateValue } from '../../../context';
-import { StoreMap, BarCodeScanner } from '../../../components';
+import { StoreMap, Camera } from '../../../components';
 import firebase from '../../../firebase';
 
 const EditBatchItem = ({ navigation, route }) => {
@@ -193,7 +193,7 @@ const EditBatchItem = ({ navigation, route }) => {
 			</Snackbar>
 		</>
 	) : (
-		<BarCodeScanner handleScan={handleBarcodeScan} />
+		<Camera handleScan={handleBarcodeScan} />
 	);
 };
 

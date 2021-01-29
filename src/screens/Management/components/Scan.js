@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { View, StyleSheet } from 'react-native';
 import { useTheme, TextInput, Button, IconButton, Caption } from 'react-native-paper';
-import { BarCodeScanner, StoreMap } from '../../../components';
+import { Camera, StoreMap } from '../../../components';
+import * as ImageManipulator from 'expo-image-manipulator';
 import { useStateValue } from '../../../context';
 import firebase from '../../../firebase';
 
@@ -81,13 +82,11 @@ const InlineButtons = ({ label = '', data, setData, product, type, containerStyl
 const Scan = () => {
 	const [{ store }] = useStateValue();
 	const [product, setProduct] = useState(initialData);
-	const [scan, setScan] = useState(false);
-
+	const [cameraType, setCameraType] = useState(false);
 	const { colors } = useTheme();
 
 	const handleBarcodeScan = async (info) => {
 		const productRef = firebase.database().ref('scanned');
-
 		productRef.push().set({ ...product, upc: info.data }, async (error) => {
 			if (error) {
 				console.log(error);
@@ -96,7 +95,7 @@ const Scan = () => {
 			}
 		});
 
-		setScan(false);
+		setCameraType(false);
 	};
 
 	const handleLocation = (coord) => {
@@ -106,9 +105,42 @@ const Scan = () => {
 		});
 	};
 
+	const handleTakePicture = async (img) => {
+		const compressedImg = await ImageManipulator.manipulateAsync(img.uri, [{ resize: { width: 300, height: 400 } }], {
+			compress: 1,
+			format: ImageManipulator.SaveFormat.PNG,
+		});
+		const filename = compressedImg.uri.substring(compressedImg.uri.lastIndexOf('/') + 1);
+
+		const blob = await new Promise((resolve, reject) => {
+			const xhr = new XMLHttpRequest();
+			xhr.onload = function () {
+				resolve(xhr.response);
+			};
+			xhr.onerror = function (e) {
+				reject(new TypeError('Network request failed'));
+			};
+			xhr.responseType = 'blob';
+			xhr.open('GET', compressedImg.uri, true);
+			xhr.send(null);
+		});
+
+		try {
+			const storageRef = firebase.storage().ref();
+			var imagesFolder = storageRef.child(`images/${filename}`);
+
+			const snapshot = await imagesFolder.put(blob);
+			const url = await snapshot.ref.getDownloadURL();
+			setProduct({ ...product, url });
+			setCameraType(false);
+		} catch (error) {
+			console.log(error);
+		}
+	};
+
 	return (
 		<View style={[styles.container, !store && { justifyContent: 'center', alignItems: 'center' }]}>
-			{!scan ? (
+			{!cameraType ? (
 				<>
 					<StoreMap store={store} product={product} handleLocation={handleLocation} isForm />
 
@@ -128,6 +160,25 @@ const Scan = () => {
 								style={[styles.input, { width: '85%' }]}
 								mode='outlined'
 								dense
+								label='filename...'
+								disabled
+								value={product.url}
+							/>
+
+							<IconButton
+								style={{ position: 'relative', top: 5 }}
+								icon='camera'
+								size={30}
+								color={colors.primary}
+								onPress={() => setCameraType('camera')}
+							/>
+						</View>
+
+						<View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+							<TextInput
+								style={[styles.input, { width: '85%' }]}
+								mode='outlined'
+								dense
 								label='upc...'
 								disabled
 								value={product.upc}
@@ -138,7 +189,7 @@ const Scan = () => {
 								icon='barcode-scan'
 								size={30}
 								color={colors.primary}
-								onPress={() => setScan(true)}
+								onPress={() => setCameraType('barcode')}
 							/>
 						</View>
 
@@ -153,7 +204,7 @@ const Scan = () => {
 					</View>
 				</>
 			) : (
-				<BarCodeScanner handleScan={handleBarcodeScan} />
+				<Camera handleBarcodeScan={handleBarcodeScan} handleTakePicture={handleTakePicture} type={cameraType} />
 			)}
 		</View>
 	);
