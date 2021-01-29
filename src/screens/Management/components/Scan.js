@@ -59,11 +59,14 @@ const InlineButtons = ({ label = '', data, setData, product, type, containerStyl
 			{data.map((item, i) => (
 				<Button
 					style={{ marginRight: label ? 10 : 0 }}
-					mode={active.status && active.index === i ? 'contained' : 'outlined'}
+					mode={(active.status && active.index === i) || product.memo === item.value ? 'contained' : 'outlined'}
 					dark
 					key={i}
 					compact
-					labelStyle={{ fontSize: 10, color: active.status && active.index === i ? 'white' : 'gray' }}
+					labelStyle={{
+						fontSize: 10,
+						color: (active.status && active.index === i) || product.memo === item.value ? 'white' : 'gray',
+					}}
 					onPress={() => {
 						setActive({
 							status: true,
