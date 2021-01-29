@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
 import { View, StyleSheet } from 'react-native';
-import { useTheme, TextInput, Button, IconButton, Caption } from 'react-native-paper';
-import { Camera, StoreMap } from '../../../components';
+import { useTheme, TextInput, Button, IconButton, ActivityIndicator } from 'react-native-paper';
+import { Camera, StoreMap, InlineButtons } from '../../../components';
 import * as ImageManipulator from 'expo-image-manipulator';
 import { useStateValue } from '../../../context';
-import firebase from '../../../firebase';
+import { saveImageToStorage, saveProductToDB } from '../../../firebase';
 
 const initialData = {
 	aisleType: 'aisle',
@@ -35,67 +35,21 @@ const btns = [
 	{ label: 'Bottom', value: 'bottom' },
 ];
 
-const InlineButtons = ({ label = '', data, setData, product, type, containerStyle }) => {
-	const [active, setActive] = useState({
-		status: label ? false : true,
-		index: 0,
-	});
-
-	return (
-		<View
-			style={[
-				{
-					marginTop: 5,
-					flexDirection: 'row',
-					flexWrap: 'wrap',
-					justifyContent: 'space-between',
-					alignItems: 'center',
-				},
-				containerStyle,
-			]}
-		>
-			{label ? <Caption>{label}: </Caption> : null}
-
-			{data.map((item, i) => (
-				<Button
-					style={{ marginRight: label ? 10 : 0 }}
-					mode={(active.status && active.index === i) || product.memo === item.value ? 'contained' : 'outlined'}
-					dark
-					key={i}
-					compact
-					labelStyle={{
-						fontSize: 10,
-						color: (active.status && active.index === i) || product.memo === item.value ? 'white' : 'gray',
-					}}
-					onPress={() => {
-						setActive({
-							status: true,
-							index: i,
-						});
-						setData({ ...product, [type]: item.value });
-					}}
-				>
-					{item.label}
-				</Button>
-			))}
-		</View>
-	);
-};
-
 const Scan = () => {
 	const [{ store }] = useStateValue();
 	const [product, setProduct] = useState(initialData);
 	const [cameraType, setCameraType] = useState(false);
+	const [saving, setSaving] = useState(false);
+	const [image, setImage] = useState({
+		filename: '',
+		uri: '',
+	});
 	const { colors } = useTheme();
 
 	const handleBarcodeScan = async (info) => {
-		const productRef = firebase.database().ref('scanned');
-		productRef.push().set({ ...product, upc: info.data }, async (error) => {
-			if (error) {
-				console.log(error);
-			} else {
-				setProduct(initialData);
-			}
+		setProduct({
+			...product,
+			upc: info.data,
 		});
 
 		setCameraType(false);
@@ -114,31 +68,32 @@ const Scan = () => {
 			format: ImageManipulator.SaveFormat.PNG,
 		});
 		const filename = compressedImg.uri.substring(compressedImg.uri.lastIndexOf('/') + 1);
-
-		const blob = await new Promise((resolve, reject) => {
-			const xhr = new XMLHttpRequest();
-			xhr.onload = function () {
-				resolve(xhr.response);
-			};
-			xhr.onerror = function (e) {
-				reject(new TypeError('Network request failed'));
-			};
-			xhr.responseType = 'blob';
-			xhr.open('GET', compressedImg.uri, true);
-			xhr.send(null);
+		setImage({
+			filename,
+			uri: compressedImg.uri,
 		});
 
-		try {
-			const storageRef = firebase.storage().ref();
-			var imagesFolder = storageRef.child(`images/${filename}`);
+		setCameraType(false);
+	};
 
-			const snapshot = await imagesFolder.put(blob);
-			const url = await snapshot.ref.getDownloadURL();
-			setProduct({ ...product, url });
-			setCameraType(false);
-		} catch (error) {
-			console.log(error);
-		}
+	const handleRetakePic = () => {
+		setImage({
+			filename: '',
+			url: '',
+		});
+	};
+
+	const handleSave = async () => {
+		setSaving(true);
+		const url = await saveImageToStorage(image, `images/${image.filename}`);
+		const copyProduct = { ...product, url };
+		await saveProductToDB(copyProduct, 'scanned');
+		setProduct(initialData);
+		setImage({
+			filename: '',
+			url: '',
+		});
+		setSaving(false);
 	};
 
 	return (
@@ -160,13 +115,23 @@ const Scan = () => {
 
 						<View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
 							<TextInput
-								style={[styles.input, { width: '85%' }]}
+								style={[styles.input, { flex: 1 }]}
 								mode='outlined'
 								dense
 								label='filename...'
 								disabled
-								value={product.url}
+								value={image.filename}
 							/>
+
+							{image.uri ? (
+								<IconButton
+									style={{ position: 'relative', top: 5 }}
+									icon='delete'
+									size={30}
+									color='red'
+									onPress={handleRetakePic}
+								/>
+							) : null}
 
 							<IconButton
 								style={{ position: 'relative', top: 5 }}
@@ -204,6 +169,15 @@ const Scan = () => {
 							setData={setProduct}
 							type='memo'
 						/>
+
+						<Button
+							labelStyle={{ textTransform: 'capitalize' }}
+							style={{ marginTop: 10, padding: 5, backgroundColor: colors.primary }}
+							mode='contained'
+							onPress={handleSave}
+						>
+							{saving ? <ActivityIndicator animating={true} color='#fff' /> : 'Save'}
+						</Button>
 					</View>
 				</>
 			) : (
