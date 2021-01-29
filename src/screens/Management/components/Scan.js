@@ -106,7 +106,7 @@ const Scan = () => {
 	};
 
 	const handleTakePicture = async (img) => {
-		const compressedImg = await ImageManipulator.manipulateAsync(img.uri, [{ resize: { width: 300, height: 400 } }], {
+		const compressedImg = await ImageManipulator.manipulateAsync(img.uri, [{ resize: { width: 400, height: 600 } }], {
 			compress: 1,
 			format: ImageManipulator.SaveFormat.PNG,
 		});

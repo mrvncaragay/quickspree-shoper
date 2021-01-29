@@ -25,7 +25,7 @@ const ProductItem = ({ product, onPress }) => {
 				backgroundColor: 'white',
 				padding: 20,
 				height: 'auto',
-				borderWidth: 1,
+				borderTopWidth: 1,
 				borderColor: 'lightgray',
 			}}
 		>
