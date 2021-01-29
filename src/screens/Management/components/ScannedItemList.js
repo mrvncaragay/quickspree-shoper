@@ -24,7 +24,7 @@ const ScannedItemList = ({ navigation }) => {
 
 	return (
 		<FlatList
-			style={{ paddingHorizontal: 20, paddingTop: 10 }}
+			style={{ paddingTop: 10 }}
 			contentContainerStyle={{ paddingBottom: 15 }}
 			showsHorizontalScrollIndicator={true}
 			data={scanned}
