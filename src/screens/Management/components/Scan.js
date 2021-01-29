@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { View, StyleSheet } from 'react-native';
-import { useTheme, TextInput, Button, IconButton, ActivityIndicator } from 'react-native-paper';
-import { Camera, StoreMap, InlineButtons } from '../../../components';
+import { useTheme, TextInput, Button, IconButton } from 'react-native-paper';
+import { Camera, StoreMap, InlineButtons, Snackbar } from '../../../components';
 import * as ImageManipulator from 'expo-image-manipulator';
 import { useStateValue } from '../../../context';
 import { saveImageToStorage, saveProductToDB } from '../../../firebase';
@@ -16,7 +16,7 @@ const initialData = {
 	productName: '',
 	upc: '',
 	size: '',
-	url: '',
+	image: {},
 	memo: '',
 };
 
@@ -39,10 +39,13 @@ const Scan = () => {
 	const [{ store }] = useStateValue();
 	const [product, setProduct] = useState(initialData);
 	const [cameraType, setCameraType] = useState(false);
-	const [saving, setSaving] = useState(false);
 	const [image, setImage] = useState({
 		filename: '',
 		uri: '',
+	});
+	const [visible, setVisible] = useState({
+		status: false,
+		message: '',
 	});
 	const { colors } = useTheme();
 
@@ -79,21 +82,23 @@ const Scan = () => {
 	const handleRetakePic = () => {
 		setImage({
 			filename: '',
-			url: '',
+			uri: '',
 		});
 	};
 
 	const handleSave = async () => {
-		setSaving(true);
-		const url = await saveImageToStorage(image, `images/${image.filename}`);
-		const copyProduct = { ...product, url };
+		const uri = await saveImageToStorage(image, `images/${image.filename}`);
+		const copyProduct = { ...product, image: { ...image, uri } };
 		await saveProductToDB(copyProduct, 'scanned');
+		setVisible({
+			status: 'true',
+			message: 'Successfully save.',
+		});
 		setProduct(initialData);
 		setImage({
 			filename: '',
-			url: '',
+			uri: '',
 		});
-		setSaving(false);
 	};
 
 	return (
@@ -176,9 +181,10 @@ const Scan = () => {
 							mode='contained'
 							onPress={handleSave}
 						>
-							{saving ? <ActivityIndicator animating={true} color='#fff' /> : 'Save'}
+							Save
 						</Button>
 					</View>
+					<Snackbar controller={visible} setVisible={() => setVisible({ status: false, message: '' })} />
 				</>
 			) : (
 				<Camera handleBarcodeScan={handleBarcodeScan} handleTakePicture={handleTakePicture} type={cameraType} />

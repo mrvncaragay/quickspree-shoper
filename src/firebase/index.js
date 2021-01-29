@@ -28,6 +28,19 @@ export const saveProductToDB = (product, path) => {
 	});
 };
 
+// delete product
+export const deleteProductToDB = (path) => {
+	return new Promise(async (resolve, reject) => {
+		try {
+			const scannedProductRef = firebase.database().ref(path);
+			await scannedProductRef.set(null);
+			resolve();
+		} catch (error) {
+			reject(error);
+		}
+	});
+};
+
 // save image to storage
 export const saveImageToStorage = (image, path) => {
 	return new Promise(async (resolve, reject) => {
@@ -46,11 +59,26 @@ export const saveImageToStorage = (image, path) => {
 
 		try {
 			const storageRef = firebase.storage().ref();
-			var imagesFolder = storageRef.child(path);
+			const imagesFolder = storageRef.child(path);
 
 			const snapshot = await imagesFolder.put(blob);
 			const url = await snapshot.ref.getDownloadURL();
 			resolve(url);
+		} catch (error) {
+			reject(error);
+		}
+	});
+};
+
+// delete image to storage
+export const deleteImageToStorage = (filename) => {
+	return new Promise(async (resolve, reject) => {
+		try {
+			const storageRef = firebase.storage().ref();
+			const imageRef = storageRef.child(`images/${filename}`);
+
+			await imageRef.delete();
+			resolve();
 		} catch (error) {
 			reject(error);
 		}

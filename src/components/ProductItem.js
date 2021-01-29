@@ -6,7 +6,7 @@ import ImageViewer from 'react-native-image-zoom-viewer';
 const ProductItem = ({ product, onPress }) => {
 	const { colors } = useTheme();
 	const [viewImage, setViewImage] = useState(false);
-	const image = [{ url: product.url }];
+	const image = [{ url: product.image.uri }];
 
 	const CustomText = ({ label, children, containerStyle }) => {
 		return (
@@ -33,7 +33,7 @@ const ProductItem = ({ product, onPress }) => {
 				<Image
 					style={styles.small}
 					source={{
-						uri: product.url,
+						uri: product.image.uri,
 					}}
 				/>
 			</TouchableWithoutFeedback>

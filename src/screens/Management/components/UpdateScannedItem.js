@@ -1,22 +1,24 @@
 import React, { useState } from 'react';
 import { View, StyleSheet } from 'react-native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
-import { TextInput, Button, useTheme, Snackbar } from 'react-native-paper';
+import { TextInput, Button, useTheme } from 'react-native-paper';
 import { useStateValue } from '../../../context';
-import { StoreMap } from '../../../components';
-import firebase from '../../../firebase';
+import { StoreMap, Snackbar } from '../../../components';
+import firebase, { saveProductToDB, deleteProductToDB, deleteImageToStorage } from '../../../firebase';
 
 const UpdateScannedItem = ({ navigation, route }) => {
 	const { colors } = useTheme();
 	const [{ store }] = useStateValue();
 	const [product, setProduct] = useState(route.params.product);
-	const [visible, setVisible] = useState(false);
+	const [visible, setVisible] = useState({
+		status: false,
+		message: '',
+	});
 
 	const saveProduct = async () => {
 		try {
-			const scannedRef = firebase.database().ref(`scanned/${product.id}`);
-			const saveRef = firebase.database().ref(`saved/${product.id}`);
-			await saveRef.set(product);
+			const scannedRef = firebase.database().ref(`scanned/${product.id}`); // change the status
+			await saveProductToDB(product, `saved/${product.id}`);
 			await scannedRef.set(null);
 			navigation.goBack();
 		} catch (error) {
@@ -30,15 +32,24 @@ const UpdateScannedItem = ({ navigation, route }) => {
 			if (error) {
 				console.log(error);
 			} else {
-				setVisible(true);
+				setVisible({
+					status: true,
+					message: 'Successfully updated.',
+				});
 			}
 		});
 	};
 
 	const handleDelete = async () => {
-		const scannedProductRef = firebase.database().ref(`scanned/${product.id}`);
-		await scannedProductRef.set(null);
-		navigation.goBack();
+		await deleteProductToDB(`scanned/${product.id}`);
+		await deleteImageToStorage(product.image.filename);
+		setVisible({
+			status: 'true',
+			message: 'Successfully deleted.',
+		});
+		setTimeout(() => {
+			navigation.goBack();
+		}, 2000);
 	};
 
 	return (
@@ -155,14 +166,7 @@ const UpdateScannedItem = ({ navigation, route }) => {
 					</Button>
 				</View>
 			</KeyboardAwareScrollView>
-			<Snackbar
-				style={{ backgroundColor: 'green' }}
-				duration={2000}
-				visible={visible}
-				onDismiss={() => setVisible(false)}
-			>
-				Batch successfully updated!
-			</Snackbar>
+			<Snackbar controller={visible} setVisible={() => setVisible({ status: false, message: '' })} />
 		</>
 	);
 };
