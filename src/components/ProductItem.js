@@ -1,11 +1,14 @@
-import React from 'react';
-import { View, TouchableOpacity, Image, StyleSheet } from 'react-native';
+import React, { useState } from 'react';
+import { View, TouchableOpacity, TouchableWithoutFeedback, Image, StyleSheet, Modal } from 'react-native';
 import { useTheme, Text } from 'react-native-paper';
+import ImageViewer from 'react-native-image-zoom-viewer';
 
-const ProductItem = ({ product, onPress, done }) => {
+const ProductItem = ({ product, onPress }) => {
 	const { colors } = useTheme();
+	const [viewImage, setViewImage] = useState(false);
+	const image = [{ url: product.url }];
 
-	const CustomText = ({ label, children, containerStyle, title }) => {
+	const CustomText = ({ label, children, containerStyle }) => {
 		return (
 			<View style={[{ flexDirection: 'row', flexWrap: 'wrap' }, containerStyle]}>
 				<Text style={{ color: colors.backdrop }}>{label}</Text>
@@ -15,24 +18,26 @@ const ProductItem = ({ product, onPress, done }) => {
 	};
 
 	return (
-		<TouchableOpacity onPress={!done ? onPress : null}>
-			<View
-				style={{
-					flexDirection: 'row',
-					flex: 1,
-					backgroundColor: 'white',
-					padding: 20,
-					height: 'auto',
-					borderWidth: 1,
-					borderColor: 'lightgray',
-				}}
-			>
+		<View
+			style={{
+				flexDirection: 'row',
+				flex: 1,
+				backgroundColor: 'white',
+				padding: 20,
+				height: 'auto',
+				borderWidth: 1,
+				borderColor: 'lightgray',
+			}}
+		>
+			<TouchableWithoutFeedback onPress={() => setViewImage(true)}>
 				<Image
 					style={styles.small}
 					source={{
 						uri: product.url,
 					}}
 				/>
+			</TouchableWithoutFeedback>
+			<TouchableOpacity style={{ flex: 1 }} onPress={onPress}>
 				<View style={{ flex: 1, paddingHorizontal: 20 }}>
 					<CustomText containerStyle={{ flex: 1 }} title>
 						{product?.productName}
@@ -45,8 +50,17 @@ const ProductItem = ({ product, onPress, done }) => {
 					<CustomText label={`Aisle - ${product?.aisleCode}`} />
 					<CustomText label={`Location - ${product?.memo}`} />
 				</View>
-			</View>
-		</TouchableOpacity>
+			</TouchableOpacity>
+			<Modal visible={viewImage} transparent={true} onRequestClose={() => setViewImage(false)}>
+				<ImageViewer
+					imageUrls={image}
+					renderIndicator={() => null}
+					onSwipeDown={() => setViewImage(false)}
+					enableSwipeDown
+					backgroundColor='white'
+				/>
+			</Modal>
+		</View>
 	);
 };
 
