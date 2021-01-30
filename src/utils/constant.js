@@ -6,9 +6,9 @@ export const productData = {
 		x: 0,
 		y: 0,
 	},
+	image: {},
 	upc: '',
 	size: '',
-	url: '',
 	memo: '',
 };
 

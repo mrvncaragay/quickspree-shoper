@@ -38,7 +38,7 @@ const Scan = () => {
 	};
 
 	const handleTakePicture = async (img) => {
-		const compressedImg = await ImageManipulator.manipulateAsync(img.uri, [{ resize: { width: 600, height: 800 } }], {
+		const compressedImg = await ImageManipulator.manipulateAsync(img.uri, [{ resize: { width: 400, height: 600 } }], {
 			compress: 1,
 			format: ImageManipulator.SaveFormat.PNG,
 		});
@@ -153,7 +153,6 @@ const Scan = () => {
 						/>
 
 						<Button
-							disabled={product.image?.filename && product.upc ? false : true}
 							labelStyle={{ textTransform: 'capitalize' }}
 							style={{ marginTop: 10, padding: 5, backgroundColor: colors.primary }}
 							mode='contained'

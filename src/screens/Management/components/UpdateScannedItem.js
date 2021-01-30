@@ -1,15 +1,17 @@
 import React, { useState } from 'react';
-import { View, StyleSheet } from 'react-native';
+import { View, StyleSheet, Platform } from 'react-native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
-import { TextInput, Button, useTheme } from 'react-native-paper';
+import { TextInput, Button, useTheme, ActivityIndicator } from 'react-native-paper';
 import { useStateValue } from '../../../context';
 import { StoreMap, Snackbar } from '../../../components';
 import { storeData } from '../../../utils/asyncStorage';
+import { saveImageToStorage, saveProductToDB } from '../../../firebase';
 
 const UpdateScannedItem = ({ navigation, route }) => {
 	const { colors } = useTheme();
-	const [{ store, scanned, saved }, dispatch] = useStateValue();
+	const [{ store, scanned }, dispatch] = useStateValue();
 	const [product, setProduct] = useState(route.params.product);
+	const [saving, setSaving] = useState(false);
 	const [visible, setVisible] = useState({
 		status: false,
 		message: '',
@@ -58,25 +60,23 @@ const UpdateScannedItem = ({ navigation, route }) => {
 	// };
 
 	const saveProduct = async () => {
-		// let toMoveProduct = null;
-		// const scannedArr = scanned.filter((data) => {
-		// 	if (data.image.filename !== product.image.filename) {
-		// 		return data;
-		// 	} else {
-		// 		toMoveProduct = data;
-		// 	}
-		// });
-		// dispatch({ type: 'setSaved', value: [...saved, toMoveProduct] });
-		// dispatch({ type: 'setScanned', value: scannedArr });
-		// storeData('saved', [...saved, toMoveProduct]);
-		// storeData('scanned', scannedArr);
-		// setVisible({
-		// 	status: true,
-		// 	message: 'Successfully saved.',
-		// });
-		// setTimeout(() => {
-		// 	navigation.goBack();
-		// }, 2000);
+		// save image to storage
+		setSaving(true);
+		const uri = await saveImageToStorage(product.image, `images/${product.image.filename}`);
+		const copyProduct = { ...product, image: { ...product.image, uri } };
+		await saveProductToDB(copyProduct, `products/${product.productName.toLowerCase()}`);
+
+		const scannedArr = scanned.filter((data) => data.image.filename !== product.image.filename && data);
+		dispatch({ type: 'setScanned', value: scannedArr });
+		storeData('scanned', scannedArr);
+		setVisible({
+			status: true,
+			message: 'Successfully saved.',
+		});
+		setSaving(false);
+		setTimeout(() => {
+			navigation.goBack();
+		}, 2000);
 	};
 
 	const handleUpdate = async () => {
@@ -226,7 +226,7 @@ const UpdateScannedItem = ({ navigation, route }) => {
 						mode='contained'
 						onPress={saveProduct}
 					>
-						Save
+						{saving ? Platform.OS === 'ios' ? <ActivityIndicator color='#fff' /> : 'Saving...' : 'Save'}
 					</Button>
 				</View>
 			</KeyboardAwareScrollView>

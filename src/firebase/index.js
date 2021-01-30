@@ -18,7 +18,7 @@ firebase.initializeApp(firebaseConfig);
 export const saveProductToDB = (product, path) => {
 	return new Promise(async (resolve, reject) => {
 		const productRef = firebase.database().ref(path);
-		productRef.push().set(product, async (error) => {
+		productRef.set(product, async (error) => {
 			if (error) {
 				reject(error);
 			} else {
