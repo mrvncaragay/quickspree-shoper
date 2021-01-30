@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { StyleSheet, Text, View, Image, TouchableOpacity } from 'react-native';
 import { Camera as ExpoCamera } from 'expo-camera';
 
-const Camera = ({ handleBarcodeScan, handleTakePicture, type }) => {
+const Camera = ({ handleBarcodeScan, handleTakePicture, closeCamera, type }) => {
 	const [hasPermission, setHasPermission] = useState(null);
 	const cameraRef = useRef(null);
 
@@ -39,15 +39,29 @@ const Camera = ({ handleBarcodeScan, handleTakePicture, type }) => {
 				autoFocus
 				onBarCodeScanned={type === 'barcode' ? handleBarcodeScan : null}
 			>
-				{type === 'camera' && (
-					<TouchableOpacity style={styles.capture} onPress={takePicture}>
-						<Image
-							source={require('../../assets/camera/cameraButton.png')}
-							style={{ width: 50, height: 50 }}
-							resizeMode={'contain'}
-						/>
-					</TouchableOpacity>
-				)}
+				<View style={{ flex: 1 }}>
+					<View style={{ height: 80, alignItems: 'flex-end' }}>
+						<TouchableOpacity style={styles.capture} onPress={closeCamera}>
+							<Image
+								source={require('../../assets/camera/cameraClose.png')}
+								style={{ width: 30, height: 30 }}
+								resizeMode={'contain'}
+							/>
+						</TouchableOpacity>
+					</View>
+					<View style={{ flex: 1 }} />
+					<View style={{ height: 80, alignItems: 'center' }}>
+						{type === 'camera' && (
+							<TouchableOpacity style={styles.capture} onPress={takePicture}>
+								<Image
+									source={require('../../assets/camera/cameraButton.png')}
+									style={{ width: 50, height: 50 }}
+									resizeMode={'contain'}
+								/>
+							</TouchableOpacity>
+						)}
+					</View>
+				</View>
 			</ExpoCamera>
 		</View>
 	);
@@ -60,8 +74,6 @@ const styles = StyleSheet.create({
 	},
 	camera: {
 		flex: 1,
-		justifyContent: 'flex-end',
-		alignItems: 'center',
 	},
 	capture: {
 		padding: 15,

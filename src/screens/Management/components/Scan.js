@@ -187,7 +187,12 @@ const Scan = () => {
 					<Snackbar controller={visible} setVisible={() => setVisible({ status: false, message: '' })} />
 				</>
 			) : (
-				<Camera handleBarcodeScan={handleBarcodeScan} handleTakePicture={handleTakePicture} type={cameraType} />
+				<Camera
+					handleBarcodeScan={handleBarcodeScan}
+					handleTakePicture={handleTakePicture}
+					closeCamera={() => setCameraType(false)}
+					type={cameraType}
+				/>
 			)}
 		</View>
 	);
