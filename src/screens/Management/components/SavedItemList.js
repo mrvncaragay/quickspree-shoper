@@ -22,6 +22,48 @@ const SavedItemList = ({ navigation }) => {
 		});
 	}, []);
 
+	// save image to storage
+	// const uri = await saveImageToStorage(image, `images/${image.filename}`);
+	// const copyProduct = { ...product, image: { ...image, uri } };
+	// await saveProductToDB(copyProduct, 'scanned');
+
+	// const saveProduct = async () => {
+	// 	try {
+	// 		const scannedRef = firebase.database().ref(`scanned/${product.id}`); // change the status
+	// 		await saveProductToDB(product, `saved/${product.id}`);
+	// 		await scannedRef.set(null);
+	// 		navigation.goBack();
+	// 	} catch (error) {
+	// 		console.log(error.message);
+	// 	}
+	// };
+
+	// const handleUpdate = async () => {
+	// 	const scannedProductRef = firebase.database().ref(`scanned/${product.id}`);
+	// 	scannedProductRef.set(product, async (error) => {
+	// 		if (error) {
+	// 			console.log(error);
+	// 		} else {
+	// 			setVisible({
+	// 				status: true,
+	// 				message: 'Successfully updated.',
+	// 			});
+	// 		}
+	// 	});
+	// };
+
+	// const handleDelete = async () => {
+	// 	await deleteProductToDB(`scanned/${product.id}`);
+	// 	await deleteImageToStorage(product.image.filename);
+	// 	setVisible({
+	// 		status: 'true',
+	// 		message: 'Successfully deleted.',
+	// 	});
+	// 	setTimeout(() => {
+	// 		navigation.goBack();
+	// 	}, 2000);
+	// };
+
 	return (
 		<FlatList
 			style={{ paddingHorizontal: 20, paddingTop: 10 }}

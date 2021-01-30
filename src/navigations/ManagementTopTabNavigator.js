@@ -6,7 +6,7 @@ import { useStateValue } from '../context';
 
 const Tab = createMaterialTopTabNavigator();
 
-const TopTabNavigator = ({ navigation, route }) => {
+const TopTabNavigator = () => {
 	const { colors } = useTheme();
 
 	const [{ scanned, saved }] = useStateValue();
@@ -23,8 +23,8 @@ const TopTabNavigator = ({ navigation, route }) => {
 			}}
 		>
 			<Tab.Screen name='SCAN' component={Scan} />
-			<Tab.Screen name='SCANNED' component={ScannedItemList} options={{ title: `${scanned.length || ''} SCANNED` }} />
-			<Tab.Screen name='SAVE' component={SavedItemList} options={{ title: `${saved.length || ''} TO-SAVE` }} />
+			<Tab.Screen name='SCANNED' component={ScannedItemList} options={{ title: `${scanned?.length || ''} SCANNED` }} />
+			<Tab.Screen name='SAVE' component={SavedItemList} options={{ title: `${saved?.length || ''} TO-SAVE` }} />
 		</Tab.Navigator>
 	);
 };

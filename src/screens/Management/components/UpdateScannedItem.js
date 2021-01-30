@@ -4,11 +4,12 @@ import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view
 import { TextInput, Button, useTheme } from 'react-native-paper';
 import { useStateValue } from '../../../context';
 import { StoreMap, Snackbar } from '../../../components';
-import firebase, { saveProductToDB, deleteProductToDB, deleteImageToStorage } from '../../../firebase';
+import firebase, { saveProductToDB } from '../../../firebase';
+import { storeData } from '../../../utils/asyncStorage';
 
 const UpdateScannedItem = ({ navigation, route }) => {
 	const { colors } = useTheme();
-	const [{ store }] = useStateValue();
+	const [{ store, scanned }, dispatch] = useStateValue();
 	const [product, setProduct] = useState(route.params.product);
 	const [visible, setVisible] = useState({
 		status: false,
@@ -27,22 +28,24 @@ const UpdateScannedItem = ({ navigation, route }) => {
 	};
 
 	const handleUpdate = async () => {
-		const scannedProductRef = firebase.database().ref(`scanned/${product.id}`);
-		scannedProductRef.set(product, async (error) => {
-			if (error) {
-				console.log(error);
+		const updatedScanned = scanned.map((data) => {
+			if (data.image.filename === product.image.filename) {
+				return product;
 			} else {
-				setVisible({
-					status: true,
-					message: 'Successfully updated.',
-				});
+				return data;
 			}
+		});
+
+		dispatch({ type: 'setScanned', value: updatedScanned });
+		storeData('scanned', updatedScanned);
+
+		setVisible({
+			status: true,
+			message: 'Successfully updated.',
 		});
 	};
 
 	const handleDelete = async () => {
-		await deleteProductToDB(`scanned/${product.id}`);
-		await deleteImageToStorage(product.image.filename);
 		setVisible({
 			status: 'true',
 			message: 'Successfully deleted.',

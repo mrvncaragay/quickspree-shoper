@@ -4,40 +4,12 @@ import { useTheme, TextInput, Button, IconButton } from 'react-native-paper';
 import { Camera, StoreMap, InlineButtons, Snackbar } from '../../../components';
 import * as ImageManipulator from 'expo-image-manipulator';
 import { useStateValue } from '../../../context';
-import { saveImageToStorage, saveProductToDB } from '../../../firebase';
-
-const initialData = {
-	aisleType: 'aisle',
-	aisleCode: '',
-	location: {
-		x: 0,
-		y: 0,
-	},
-	productName: '',
-	upc: '',
-	size: '',
-	image: {},
-	memo: '',
-};
-
-const aisle = [
-	{ label: 'Aisle', value: 'aisle' },
-	{ label: 'Produce', value: 'produce' },
-	{ label: 'Dairy', value: 'dairy' },
-	{ label: 'Meat', value: 'meat' },
-	{ label: 'Deli', value: 'deli' },
-	{ label: 'Bakery', value: 'bakery' },
-];
-
-const btns = [
-	{ label: 'Top', value: 'top' },
-	{ label: 'Middle', value: 'middle' },
-	{ label: 'Bottom', value: 'bottom' },
-];
+import { storeData } from '../../../utils/asyncStorage';
+import { productData, aisle, btns } from '../../../utils/constant';
 
 const Scan = () => {
-	const [{ store }] = useStateValue();
-	const [product, setProduct] = useState(initialData);
+	const [{ store, scanned }, dispatch] = useStateValue();
+	const [product, setProduct] = useState(productData);
 	const [cameraType, setCameraType] = useState(false);
 	const [image, setImage] = useState({
 		filename: '',
@@ -66,7 +38,7 @@ const Scan = () => {
 	};
 
 	const handleTakePicture = async (img) => {
-		const compressedImg = await ImageManipulator.manipulateAsync(img.uri, [{ resize: { width: 400, height: 600 } }], {
+		const compressedImg = await ImageManipulator.manipulateAsync(img.uri, [{ resize: { width: 600, height: 800 } }], {
 			compress: 1,
 			format: ImageManipulator.SaveFormat.PNG,
 		});
@@ -87,14 +59,19 @@ const Scan = () => {
 	};
 
 	const handleSave = async () => {
-		const uri = await saveImageToStorage(image, `images/${image.filename}`);
-		const copyProduct = { ...product, image: { ...image, uri } };
-		await saveProductToDB(copyProduct, 'scanned');
+		const newProduct = {
+			...product,
+			image,
+		};
+		const scannedData = [...scanned, newProduct];
+		dispatch({ type: 'setScanned', value: scannedData });
+		storeData('scanned', scannedData);
+
 		setVisible({
 			status: 'true',
 			message: 'Successfully save.',
 		});
-		setProduct(initialData);
+		setProduct(productData);
 		setImage({
 			filename: '',
 			uri: '',
