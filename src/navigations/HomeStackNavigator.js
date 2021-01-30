@@ -3,7 +3,7 @@ import { AddStore, SearchStore } from '../screens';
 import { createStackNavigator } from '@react-navigation/stack';
 import { UpdateScannedItem } from '../screens/Management/components';
 import BottomTabNavigator from '../navigations/BottomTabNavigator';
-import { readData } from '../utils/asyncStorage';
+import { readData, removeData } from '../utils/asyncStorage';
 import { useStateValue } from '../context';
 
 const Stack = createStackNavigator();

@@ -1,7 +1,7 @@
 import React from 'react';
 import { useTheme } from 'react-native-paper';
 import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
-import { Scan, ScannedItemList, SavedItemList } from '../screens/Management/components';
+import { Scan, ScannedItemList } from '../screens/Management/components';
 import { useStateValue } from '../context';
 
 const Tab = createMaterialTopTabNavigator();
@@ -9,7 +9,7 @@ const Tab = createMaterialTopTabNavigator();
 const TopTabNavigator = () => {
 	const { colors } = useTheme();
 
-	const [{ scanned, saved }] = useStateValue();
+	const [{ scanned }] = useStateValue();
 
 	return (
 		<Tab.Navigator
@@ -24,7 +24,6 @@ const TopTabNavigator = () => {
 		>
 			<Tab.Screen name='SCAN' component={Scan} />
 			<Tab.Screen name='SCANNED' component={ScannedItemList} options={{ title: `${scanned?.length || ''} SCANNED` }} />
-			<Tab.Screen name='SAVE' component={SavedItemList} options={{ title: `${saved?.length || ''} TO-SAVE` }} />
 		</Tab.Navigator>
 	);
 };

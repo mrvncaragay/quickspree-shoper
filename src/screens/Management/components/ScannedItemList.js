@@ -16,7 +16,7 @@ const ScannedItemList = ({ navigation }) => {
 			renderItem={({ item, index }) => (
 				<ProductItem key={index} product={item} onPress={() => navigation.navigate('UpdateBatch', { product: item })} />
 			)}
-			keyExtractor={(item, index) => index.toString()}
+			keyExtractor={(item) => item.image.filename}
 			ItemSeparatorComponent={() => <Divider style={{ height: 10, backgroundColor: '#fff' }} />}
 		/>
 	);

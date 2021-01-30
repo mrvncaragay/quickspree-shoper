@@ -153,6 +153,7 @@ const Scan = () => {
 						/>
 
 						<Button
+							disabled={product.image?.filename && product.upc ? false : true}
 							labelStyle={{ textTransform: 'capitalize' }}
 							style={{ marginTop: 10, padding: 5, backgroundColor: colors.primary }}
 							mode='contained'

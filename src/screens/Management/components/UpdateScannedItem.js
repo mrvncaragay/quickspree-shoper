@@ -4,27 +4,79 @@ import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view
 import { TextInput, Button, useTheme } from 'react-native-paper';
 import { useStateValue } from '../../../context';
 import { StoreMap, Snackbar } from '../../../components';
-import firebase, { saveProductToDB } from '../../../firebase';
 import { storeData } from '../../../utils/asyncStorage';
 
 const UpdateScannedItem = ({ navigation, route }) => {
 	const { colors } = useTheme();
-	const [{ store, scanned }, dispatch] = useStateValue();
+	const [{ store, scanned, saved }, dispatch] = useStateValue();
 	const [product, setProduct] = useState(route.params.product);
 	const [visible, setVisible] = useState({
 		status: false,
 		message: '',
 	});
 
+	// save image to storage
+	// const uri = await saveImageToStorage(image, `images/${image.filename}`);
+	// const copyProduct = { ...product, image: { ...image, uri } };
+	// await saveProductToDB(copyProduct, 'scanned');
+
+	// const saveProduct = async () => {
+	// 	try {
+	// 		const scannedRef = firebase.database().ref(`scanned/${product.id}`); // change the status
+	// 		await saveProductToDB(product, `saved/${product.id}`);
+	// 		await scannedRef.set(null);
+	// 		navigation.goBack();
+	// 	} catch (error) {
+	// 		console.log(error.message);
+	// 	}
+	// };
+
+	// const handleUpdate = async () => {
+	// 	const scannedProductRef = firebase.database().ref(`scanned/${product.id}`);
+	// 	scannedProductRef.set(product, async (error) => {
+	// 		if (error) {
+	// 			console.log(error);
+	// 		} else {
+	// 			setVisible({
+	// 				status: true,
+	// 				message: 'Successfully updated.',
+	// 			});
+	// 		}
+	// 	});
+	// };
+
+	// const handleDelete = async () => {
+	// 	await deleteProductToDB(`scanned/${product.id}`);
+	// 	await deleteImageToStorage(product.image.filename);
+	// 	setVisible({
+	// 		status: 'true',
+	// 		message: 'Successfully deleted.',
+	// 	});
+	// 	setTimeout(() => {
+	// 		navigation.goBack();
+	// 	}, 2000);
+	// };
+
 	const saveProduct = async () => {
-		try {
-			const scannedRef = firebase.database().ref(`scanned/${product.id}`); // change the status
-			await saveProductToDB(product, `saved/${product.id}`);
-			await scannedRef.set(null);
-			navigation.goBack();
-		} catch (error) {
-			console.log(error.message);
-		}
+		// let toMoveProduct = null;
+		// const scannedArr = scanned.filter((data) => {
+		// 	if (data.image.filename !== product.image.filename) {
+		// 		return data;
+		// 	} else {
+		// 		toMoveProduct = data;
+		// 	}
+		// });
+		// dispatch({ type: 'setSaved', value: [...saved, toMoveProduct] });
+		// dispatch({ type: 'setScanned', value: scannedArr });
+		// storeData('saved', [...saved, toMoveProduct]);
+		// storeData('scanned', scannedArr);
+		// setVisible({
+		// 	status: true,
+		// 	message: 'Successfully saved.',
+		// });
+		// setTimeout(() => {
+		// 	navigation.goBack();
+		// }, 2000);
 	};
 
 	const handleUpdate = async () => {
@@ -46,6 +98,15 @@ const UpdateScannedItem = ({ navigation, route }) => {
 	};
 
 	const handleDelete = async () => {
+		const updatedScanned = scanned.filter((data) => {
+			if (data.image.filename !== product.image.filename) {
+				return product;
+			}
+		});
+
+		dispatch({ type: 'setScanned', value: updatedScanned });
+		storeData('scanned', updatedScanned);
+
 		setVisible({
 			status: 'true',
 			message: 'Successfully deleted.',
