@@ -5,6 +5,7 @@ import ImageViewer from 'react-native-image-zoom-viewer';
 import { useNavigation } from '@react-navigation/native';
 import { useStateValue } from '../../../context';
 import { pageCrawler } from '../../../../config';
+import { saveProductToDB } from '../../../firebase';
 import axios from 'axios';
 
 const BatchItem = ({ product, onPress }) => {
@@ -36,7 +37,18 @@ const BatchItem = ({ product, onPress }) => {
 		setSearhImage(false);
 	};
 
-	const onToggleSwitch = () => setIsSwitchOn(!isSwitchOn);
+	const onToggleSwitch = async () => {
+		await saveProductToDB({ ...product, status: !isSwitchOn ? 'looking' : 'new' }, `batch/${product.id}`);
+		setIsSwitchOn(!isSwitchOn);
+	};
+
+	const onFound = async () => {
+		await saveProductToDB({ ...product, status: 'found' }, `batch/${product.id}`);
+	};
+
+	const onReplace = async () => {
+		await saveProductToDB({ ...product, status: 'replace' }, `batch/${product.id}`);
+	};
 
 	return (
 		<View
@@ -63,8 +75,9 @@ const BatchItem = ({ product, onPress }) => {
 
 			<View style={{ flex: 1, paddingHorizontal: 20 }}>
 				<Switch
+					color='darkred'
 					style={{ alignSelf: 'flex-end', position: 'absolute' }}
-					value={isSwitchOn}
+					value={product.status === 'looking'}
 					onValueChange={onToggleSwitch}
 				/>
 				<TouchableOpacity style={{ flex: 1, width: 190 }} onPress={onPress}>
@@ -79,12 +92,12 @@ const BatchItem = ({ product, onPress }) => {
 				<CustomText label={`Location - ${product?.memo}`} />
 			</View>
 
-			{isSwitchOn && (
+			{product.status === 'looking' && (
 				<View style={styles.buttonContainer}>
-					<Button mode='outlined' compact labelStyle={styles.buttonLabel}>
+					<Button mode='outlined' compact labelStyle={styles.buttonLabel} onPress={onReplace}>
 						Replace
 					</Button>
-					<Button mode='outlined' labelStyle={styles.buttonLabel}>
+					<Button mode='outlined' labelStyle={styles.buttonLabel} onPress={onFound}>
 						Found
 					</Button>
 				</View>

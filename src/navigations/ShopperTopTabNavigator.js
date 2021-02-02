@@ -9,8 +9,35 @@ const Tab = createMaterialTopTabNavigator();
 const TopTabNavigator = ({ navigation, route }) => {
 	const { colors } = useTheme();
 
-	const [{ batch, done, replacement }] = useStateValue();
+	const [{ batch }] = useStateValue();
 
+	const count = batch.reduce(
+		(acc, val) => {
+			if (val.status === 'new' || val.status === 'looking') {
+				acc = {
+					...acc,
+					find: acc.find + 1,
+				};
+			} else if (val.status === 'replace') {
+				acc = {
+					...acc,
+					replace: acc.replace + 1,
+				};
+			} else if (val.status === 'found') {
+				acc = {
+					...acc,
+					found: acc.found + 1,
+				};
+			}
+
+			return acc;
+		},
+		{
+			find: 0,
+			replace: 0,
+			found: 0,
+		},
+	);
 	return (
 		<Tab.Navigator
 			tabBarOptions={{
@@ -22,13 +49,13 @@ const TopTabNavigator = ({ navigation, route }) => {
 				},
 			}}
 		>
-			<Tab.Screen name='BATCH' component={BatchItemList} options={{ title: `${batch.length || ''} TO-FIND` }} />
+			<Tab.Screen name='BATCH' component={BatchItemList} options={{ title: `${count.find || ''} TO-FIND` }} />
 			<Tab.Screen
 				name='REPLACEMENT'
 				component={ReplacementItemList}
-				options={{ title: `${replacement.length || ''} REPLACEMENT` }}
+				options={{ title: `${count.replace || ''} REPLACEMENT` }}
 			/>
-			<Tab.Screen name='DONE' component={DoneItemList} options={{ title: `${done.length || ''} DONE` }} />
+			<Tab.Screen name='DONE' component={DoneItemList} options={{ title: `${count.found || ''} DONE` }} />
 		</Tab.Navigator>
 	);
 };
