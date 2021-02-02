@@ -4,17 +4,13 @@ import { useTheme, TextInput, Button, IconButton } from 'react-native-paper';
 import { Camera, StoreMap, InlineButtons, Snackbar } from '../../../components';
 // import * as ImageManipulator from 'expo-image-manipulator';
 import { useStateValue } from '../../../context';
-import { storeData } from '../../../utils/asyncStorage';
-import { productData, aisle, btns } from '../../../utils/constant';
+import { aisle, btns } from '../../../utils/constant';
+import { saveProductToDB } from '../../../firebase';
 
 const UpdateBatchItem = ({ navigation, route }) => {
-	const [{ store, scanned }, dispatch] = useStateValue();
+	const [{ store }] = useStateValue();
 	const [product, setProduct] = useState(route.params.product);
 	const [cameraType, setCameraType] = useState(false);
-	const [image, setImage] = useState({
-		filename: '',
-		uri: '',
-	});
 	const [visible, setVisible] = useState({
 		status: false,
 		message: '',
@@ -59,23 +55,14 @@ const UpdateBatchItem = ({ navigation, route }) => {
 	// };
 
 	const handleSave = async () => {
-		const newProduct = {
-			...product,
-			image,
-		};
-		const scannedData = [...scanned, newProduct];
-		dispatch({ type: 'setScanned', value: scannedData });
-		storeData('scanned', scannedData);
+		await saveProductToDB(product, `batch/${product.id}`);
 
 		setVisible({
 			status: 'true',
 			message: 'Successfully save.',
 		});
-		setProduct(productData);
-		setImage({
-			filename: '',
-			uri: '',
-		});
+
+		setTimeout(() => navigation.goBack(), 1000);
 	};
 
 	return (
@@ -86,6 +73,15 @@ const UpdateBatchItem = ({ navigation, route }) => {
 
 					<View style={{ flex: 1, backgroundColor: 'white', paddingHorizontal: 20 }}>
 						<InlineButtons data={aisle} product={product} setData={setProduct} type='aisleType' />
+						<TextInput
+							multiline
+							style={styles.input}
+							mode='outlined'
+							dense
+							label='Product name'
+							value={product.productName}
+							onChangeText={(productName) => setProduct({ ...product, productName })}
+						/>
 						<TextInput
 							style={styles.input}
 							mode='outlined'
@@ -144,6 +140,15 @@ const UpdateBatchItem = ({ navigation, route }) => {
 							/>
 						</View>
 
+						<TextInput
+							style={styles.input}
+							mode='outlined'
+							dense
+							label='Size'
+							value={product.size}
+							onChangeText={(size) => setProduct({ ...product, size })}
+						/>
+
 						<InlineButtons
 							containerStyle={{ justifyContent: 'flex-start' }}
 							label='Location'
@@ -161,6 +166,17 @@ const UpdateBatchItem = ({ navigation, route }) => {
 						>
 							Save
 						</Button>
+
+						{product.status === 'found' && (
+							<Button
+								labelStyle={{ textTransform: 'capitalize' }}
+								style={{ marginTop: 10, padding: 5, backgroundColor: colors.primary }}
+								mode='contained'
+								onPress={handleSave}
+							>
+								Upload
+							</Button>
+						)}
 					</View>
 					<Snackbar controller={visible} setVisible={() => setVisible({ status: false, message: '' })} />
 				</>

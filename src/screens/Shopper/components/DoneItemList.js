@@ -1,7 +1,7 @@
 import React from 'react';
 import { FlatList } from 'react-native';
 import { Divider } from 'react-native-paper';
-import { ProductItem } from '../../../components';
+import BatchItem from './BatchItem';
 import { useStateValue } from '../../../context';
 
 const DoneItemList = ({ navigation }) => {
@@ -13,7 +13,7 @@ const DoneItemList = ({ navigation }) => {
 			showsHorizontalScrollIndicator={true}
 			data={batch.filter((b) => b.status === 'found').sort((a, b) => a.aisleCode > b.aisleCode)}
 			renderItem={({ item }) => (
-				<ProductItem done product={item} onPress={() => navigation.navigate('UpdateBatch', { product: item })} />
+				<BatchItem done product={item} onPress={() => navigation.navigate('UpdateBatch', { product: item })} />
 			)}
 			keyExtractor={(item) => item.id}
 			ItemSeparatorComponent={() => <Divider style={{ height: 10, backgroundColor: '#fff' }} />}
