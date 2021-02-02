@@ -74,12 +74,14 @@ const BatchItem = ({ product, onPress }) => {
 			</TouchableOpacity>
 
 			<View style={{ flex: 1, paddingHorizontal: 20 }}>
-				<Switch
-					color='darkred'
-					style={{ alignSelf: 'flex-end', position: 'absolute' }}
-					value={product.status === 'looking'}
-					onValueChange={onToggleSwitch}
-				/>
+				{product.status !== 'management' && (
+					<Switch
+						color='darkred'
+						style={{ alignSelf: 'flex-end', position: 'absolute' }}
+						value={product.status === 'looking'}
+						onValueChange={onToggleSwitch}
+					/>
+				)}
 				<TouchableOpacity style={{ flex: 1, width: 190 }} onPress={onPress}>
 					<CustomText containerStyle={{ flex: 1, width: 190 }} title>
 						{product?.productName}

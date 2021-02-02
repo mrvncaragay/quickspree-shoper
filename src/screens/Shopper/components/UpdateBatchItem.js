@@ -5,7 +5,7 @@ import { Camera, StoreMap, InlineButtons, Snackbar } from '../../../components';
 // import * as ImageManipulator from 'expo-image-manipulator';
 import { useStateValue } from '../../../context';
 import { aisle, btns } from '../../../utils/constant';
-import { saveProductToDB } from '../../../firebase';
+import { saveProductToDB, deleteProductToDB } from '../../../firebase';
 
 const UpdateBatchItem = ({ navigation, route }) => {
 	const [{ store }] = useStateValue();
@@ -60,6 +60,33 @@ const UpdateBatchItem = ({ navigation, route }) => {
 		setVisible({
 			status: 'true',
 			message: 'Successfully save.',
+		});
+
+		setTimeout(() => navigation.goBack(), 1000);
+	};
+
+	const handleManagement = async () => {
+		await saveProductToDB({ ...product, status: 'management' }, `batch/${product.id}`);
+
+		setVisible({
+			status: 'true',
+			message: 'Successfully moved.',
+		});
+
+		setTimeout(() => navigation.goBack(), 1000);
+	};
+
+	const handleUploadToDB = async () => {
+		const updatedProduct = { ...product };
+		const id = updatedProduct.id;
+		delete updatedProduct.status;
+		delete updatedProduct.id;
+		await saveProductToDB(updatedProduct, `products/${product.productName}`);
+		await deleteProductToDB(`batch/${id}`);
+
+		setVisible({
+			status: 'true',
+			message: 'Successfully saved to DB.',
 		});
 
 		setTimeout(() => navigation.goBack(), 1000);
@@ -127,8 +154,8 @@ const UpdateBatchItem = ({ navigation, route }) => {
 								mode='outlined'
 								dense
 								label='upc...'
-								disabled
 								value={product.upc}
+								onChangeText={(upc) => setProduct({ ...product, upc })}
 							/>
 
 							<IconButton
@@ -172,7 +199,18 @@ const UpdateBatchItem = ({ navigation, route }) => {
 								labelStyle={{ textTransform: 'capitalize' }}
 								style={{ marginTop: 10, padding: 5, backgroundColor: colors.primary }}
 								mode='contained'
-								onPress={handleSave}
+								onPress={handleManagement}
+							>
+								Move to Management
+							</Button>
+						)}
+
+						{product.status === 'management' && (
+							<Button
+								labelStyle={{ textTransform: 'capitalize' }}
+								style={{ marginTop: 10, padding: 5, backgroundColor: colors.primary }}
+								mode='contained'
+								onPress={handleUploadToDB}
 							>
 								Upload
 							</Button>

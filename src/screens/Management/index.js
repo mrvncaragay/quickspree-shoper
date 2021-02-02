@@ -1,50 +1,24 @@
-import React, { useEffect } from 'react';
-import { View, StyleSheet } from 'react-native';
-import { useTheme, ActivityIndicator } from 'react-native-paper';
-import { Header as HeaderComponent, SelectStore } from '../../components';
+import React from 'react';
+import { FlatList } from 'react-native';
+import { Divider } from 'react-native-paper';
+import BatchItem from '../Shopper/components/BatchItem';
 import { useStateValue } from '../../context';
-import { readData } from '../../utils/asyncStorage';
-import ManagementTopTabNavigator from '../../navigations/ManagementTopTabNavigator';
 
 const Management = ({ navigation }) => {
-	const [{ store, isLoading }, dispatch] = useStateValue();
-	const { colors } = useTheme();
-
-	useEffect(() => {
-		(async () => {
-			const store = await readData('store');
-			if (store) {
-				dispatch({ type: 'setStore', value: store });
-			}
-
-			dispatch({ type: 'isLoading', value: false });
-		})();
-	}, []);
+	const [{ batch }] = useStateValue();
 
 	return (
-		<View style={[styles.container, !store && { justifyContent: 'center', alignItems: 'center' }]}>
-			{isLoading ? (
-				<ActivityIndicator size='large' style={{ flex: 1 }} />
-			) : store ? (
-				<>
-					<HeaderComponent store={store} colors={colors} navigation={navigation} />
-					<ManagementTopTabNavigator />
-				</>
-			) : (
-				<SelectStore colors={colors} navigation={navigation} />
+		<FlatList
+			contentContainerStyle={{ paddingBottom: 15 }}
+			showsHorizontalScrollIndicator={true}
+			data={batch.filter((b) => b.status === 'management').sort((a, b) => a.aisleCode > b.aisleCode)}
+			renderItem={({ item }) => (
+				<BatchItem done product={item} onPress={() => navigation.navigate('UpdateBatch', { product: item })} />
 			)}
-		</View>
+			keyExtractor={(item) => item.id}
+			ItemSeparatorComponent={() => <Divider style={{ height: 10, backgroundColor: '#fff' }} />}
+		/>
 	);
 };
-
-const styles = StyleSheet.create({
-	container: {
-		flex: 1,
-		backgroundColor: '#fff',
-	},
-	input: {
-		marginTop: 5,
-	},
-});
 
 export default Management;
