@@ -26,7 +26,7 @@ const TopTabNavigator = ({ navigation, route }) => {
 			<Tab.Screen
 				name='REPLACEMENT'
 				component={ReplacementItemList}
-				options={{ title: `${replacement.length || ''} NEEDED REPLACEMENT` }}
+				options={{ title: `${replacement.length || ''} REPLACEMENT` }}
 			/>
 			<Tab.Screen name='DONE' component={DoneItemList} options={{ title: `${done.length || ''} DONE` }} />
 		</Tab.Navigator>

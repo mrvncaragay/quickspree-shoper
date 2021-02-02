@@ -14,7 +14,11 @@ const ScannedItemList = ({ navigation }) => {
 			showsHorizontalScrollIndicator={true}
 			data={scanned}
 			renderItem={({ item, index }) => (
-				<ProductItem key={index} product={item} onPress={() => navigation.navigate('UpdateBatch', { product: item })} />
+				<ProductItem
+					key={index}
+					product={item}
+					onPress={() => navigation.navigate('UpdateScanned', { product: item })}
+				/>
 			)}
 			keyExtractor={(item) => item.image.filename}
 			ItemSeparatorComponent={() => <Divider style={{ height: 10, backgroundColor: '#fff' }} />}

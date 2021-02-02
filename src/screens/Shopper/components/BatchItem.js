@@ -1,20 +1,20 @@
 import React, { useState } from 'react';
-import { View, TouchableOpacity, Image, StyleSheet, Modal } from 'react-native';
-import { useTheme, Text, ActivityIndicator, Switch } from 'react-native-paper';
+import { View, TouchableOpacity, Image, StyleSheet, Modal, Platform } from 'react-native';
+import { useTheme, Text, ActivityIndicator, Switch, Button } from 'react-native-paper';
 import ImageViewer from 'react-native-image-zoom-viewer';
 import { useNavigation } from '@react-navigation/native';
-import { Feather } from '@expo/vector-icons';
-import { useStateValue } from '../context';
-import { pageCrawler } from '../../config';
+import { useStateValue } from '../../../context';
+import { pageCrawler } from '../../../../config';
 import axios from 'axios';
 
-const ProductItem = ({ product, onPress }) => {
+const BatchItem = ({ product, onPress }) => {
 	const [{ store }] = useStateValue();
 	const navigation = useNavigation();
 	const { colors } = useTheme();
 	const [viewImage, setViewImage] = useState(false);
 	const [searchImage, setSearhImage] = useState(false);
-	const image = [{ url: product?.uri ? product?.uri : '../../assets/camera/noImage.png' }];
+	const [isSwitchOn, setIsSwitchOn] = React.useState(false);
+	const image = [{ url: product?.uri ? product?.uri : '../../../../assets/camera/noImage.png' }];
 
 	const CustomText = ({ label, children, containerStyle }) => {
 		return (
@@ -29,9 +29,14 @@ const ProductItem = ({ product, onPress }) => {
 		setSearhImage(true);
 		const response = await axios.get(pageCrawler(store.name, product.productName));
 
-		navigation.navigate('ImageSelect', { urls: response.data.urls, id: product.id });
+		if (response.data?.urls) {
+			navigation.navigate('ImageSelect', { urls: response.data.urls, id: product.id });
+		}
+
 		setSearhImage(false);
 	};
+
+	const onToggleSwitch = () => setIsSwitchOn(!isSwitchOn);
 
 	return (
 		<View
@@ -51,15 +56,19 @@ const ProductItem = ({ product, onPress }) => {
 				) : (
 					<Image
 						style={styles.small}
-						source={product?.uri ? { uri: product.uri } : require('../../assets/camera/noImage.png')}
+						source={product?.uri ? { uri: product.uri } : require('../../../../assets/camera/noImage.png')}
 					/>
 				)}
 			</TouchableOpacity>
 
 			<View style={{ flex: 1, paddingHorizontal: 20 }}>
-				<Switch style={{ alignSelf: 'flex-end', position: 'absolute' }} />
-				<TouchableOpacity style={{ flex: 1, width: 210 }} onPress={onPress}>
-					<CustomText containerStyle={{ flex: 1, width: 210 }} title>
+				<Switch
+					style={{ alignSelf: 'flex-end', position: 'absolute' }}
+					value={isSwitchOn}
+					onValueChange={onToggleSwitch}
+				/>
+				<TouchableOpacity style={{ flex: 1, width: 190 }} onPress={onPress}>
+					<CustomText containerStyle={{ flex: 1, width: 190 }} title>
 						{product?.productName}
 						{'\n'}
 						<Text style={{ color: colors.backdrop, fontSize: 14 }}>{!product?.size ? '' : product.size}</Text>
@@ -70,6 +79,16 @@ const ProductItem = ({ product, onPress }) => {
 				<CustomText label={`Location - ${product?.memo}`} />
 			</View>
 
+			{isSwitchOn && (
+				<View style={styles.buttonContainer}>
+					<Button mode='outlined' compact labelStyle={styles.buttonLabel}>
+						Replace
+					</Button>
+					<Button mode='outlined' labelStyle={styles.buttonLabel}>
+						Found
+					</Button>
+				</View>
+			)}
 			<Modal visible={viewImage} transparent={true} onRequestClose={() => setViewImage(false)}>
 				<ImageViewer
 					imageUrls={image}
@@ -88,6 +107,24 @@ const styles = StyleSheet.create({
 		width: 90,
 		height: 90,
 	},
+
+	buttonContainer: {
+		flexDirection: 'row',
+		backgroundColor: '#fff',
+		position: 'absolute',
+		alignSelf: 'flex-end',
+		width: Platform.OS === 'ios' ? 140 : 120,
+		left: Platform.OS === 'ios' ? '65%' : '70%',
+		justifyContent: 'space-between',
+		bottom: Platform.OS === 'ios' ? 0 : 1,
+	},
+
+	buttonLabel: {
+		fontSize: 11,
+		color: 'gray',
+		textTransform: 'capitalize',
+		letterSpacing: 0.5,
+	},
 });
 
-export default ProductItem;
+export default BatchItem;

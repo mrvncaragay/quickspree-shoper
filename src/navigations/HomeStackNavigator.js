@@ -2,6 +2,7 @@ import React, { useEffect } from 'react';
 import { AddStore, SearchStore } from '../screens';
 import { createStackNavigator } from '@react-navigation/stack';
 import { UpdateScannedItem } from '../screens/Management/components';
+import { UpdateBatchItem } from '../screens/Shopper/components';
 import ImageSelect from '../screens/ImageSelect';
 import BottomTabNavigator from '../navigations/BottomTabNavigator';
 import { readData } from '../utils/asyncStorage';
@@ -42,7 +43,8 @@ const CreateAdd = () => {
 			<Stack.Screen name='Shopper' component={BottomTabNavigator} options={{ headerShown: false }} />
 			<Stack.Screen name='SearchStore' component={SearchStore} options={{ headerShown: false }} />
 			<Stack.Screen name='AddStore' component={AddStore} options={{ headerShown: false }} />
-			<Stack.Screen name='UpdateBatch' component={UpdateScannedItem} options={{ headerShown: false }} />
+			<Stack.Screen name='UpdateScanned' component={UpdateScannedItem} options={{ headerShown: false }} />
+			<Stack.Screen name='UpdateBatch' component={UpdateBatchItem} options={{ headerShown: false }} />
 			<Stack.Screen name='ImageSelect' component={ImageSelect} options={{ headerShown: false }} />
 		</Stack.Navigator>
 	);

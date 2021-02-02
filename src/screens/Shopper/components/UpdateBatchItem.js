@@ -1,46 +1,33 @@
 import React, { useState } from 'react';
 import { View, StyleSheet } from 'react-native';
-import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
-import { TextInput, Button, useTheme, Snackbar } from 'react-native-paper';
+import { useTheme, TextInput, Button, IconButton } from 'react-native-paper';
+import { Camera, StoreMap, InlineButtons, Snackbar } from '../../../components';
+// import * as ImageManipulator from 'expo-image-manipulator';
 import { useStateValue } from '../../../context';
-import { StoreMap, Camera } from '../../../components';
-import firebase from '../../../firebase';
+import { storeData } from '../../../utils/asyncStorage';
+import { productData, aisle, btns } from '../../../utils/constant';
 
-const EditBatchItem = ({ navigation, route }) => {
-	const { colors } = useTheme();
-	const [{ store }] = useStateValue();
+const UpdateBatchItem = ({ navigation, route }) => {
+	const [{ store, scanned }, dispatch] = useStateValue();
 	const [product, setProduct] = useState(route.params.product);
-	const [scan, setScan] = useState(false);
-	const [visible, setVisible] = useState(false);
-	const [active, setActive] = useState({
-		status: false,
-		index: null,
+	const [cameraType, setCameraType] = useState(false);
+	const [image, setImage] = useState({
+		filename: '',
+		uri: '',
 	});
+	const [visible, setVisible] = useState({
+		status: false,
+		message: '',
+	});
+	const { colors } = useTheme();
 
 	const handleBarcodeScan = async (info) => {
-		if (info) {
-			if (!product.upc) {
-				setProduct({
-					...product,
-					upc: info.data,
-				});
-			} else {
-				try {
-					// Match, move this product in Done
-					if (info.data === product.upc) {
-						const batchRef = firebase.database().ref(`batch/${store.name}-${store.storeNumber}/${product.id}`);
-						const doneRef = firebase.database().ref(`done/${product.id}`);
-						await doneRef.set(product);
-						await batchRef.set(null);
-						navigation.goBack();
-					}
-				} catch (error) {
-					console.log(error.message);
-				}
-			}
+		setProduct({
+			...product,
+			upc: info.data,
+		});
 
-			setScan(false);
-		}
+		setCameraType(false);
 	};
 
 	const handleLocation = (coord) => {
@@ -50,150 +37,137 @@ const EditBatchItem = ({ navigation, route }) => {
 		});
 	};
 
-	const handleUpdate = async () => {
-		const scannedProductRef = firebase.database().ref(`scanned/${product.id}`);
-		scannedProductRef.set(product, async (error) => {
-			if (error) {
-				console.log(error);
-			} else {
-				setVisible(true);
-			}
+	// const handleTakePicture = async (img) => {
+	// 	const compressedImg = await ImageManipulator.manipulateAsync(img.uri, [{ resize: { width: 400, height: 600 } }], {
+	// 		compress: 1,
+	// 		format: ImageManipulator.SaveFormat.PNG,
+	// 	});
+	// 	const filename = compressedImg.uri.substring(compressedImg.uri.lastIndexOf('/') + 1);
+	// 	setImage({
+	// 		filename,
+	// 		uri: compressedImg.uri,
+	// 	});
+
+	// 	setCameraType(false);
+	// };
+
+	// const handleRetakePic = () => {
+	// 	setImage({
+	// 		filename: '',
+	// 		uri: '',
+	// 	});
+	// };
+
+	const handleSave = async () => {
+		const newProduct = {
+			...product,
+			image,
+		};
+		const scannedData = [...scanned, newProduct];
+		dispatch({ type: 'setScanned', value: scannedData });
+		storeData('scanned', scannedData);
+
+		setVisible({
+			status: 'true',
+			message: 'Successfully save.',
+		});
+		setProduct(productData);
+		setImage({
+			filename: '',
+			uri: '',
 		});
 	};
 
-	// const handleReplacement = async () => {
-	// 	try {
-	// 		// Match, move this product in replacement
-	// 		const batchRef = firebase.database().ref(`batch/${store.name}-${store.storeNumber}/${product.id}`);
-	// 		const replacementRef = firebase.database().ref(`replacement/${product.id}`);
-	// 		await replacementRef.set(product);
-	// 		await batchRef.set(null);
-	// 		navigation.goBack();
-	// 	} catch (error) {
-	// 		console.log(error.message);
-	// 	}
-	// };
+	return (
+		<View style={[styles.container, !store && { justifyContent: 'center', alignItems: 'center' }]}>
+			{!cameraType ? (
+				<>
+					<StoreMap store={store} product={product} handleLocation={handleLocation} isForm />
 
-	return !scan ? (
-		<>
-			<KeyboardAwareScrollView
-				scrollEnabled={false}
-				resetScrollToCoords={{ x: 0, y: 0 }}
-				style={[styles.container, !store && { justifyContent: 'center', alignItems: 'center' }]}
-			>
-				<StoreMap store={store} product={product} handleLocation={handleLocation} />
+					<View style={{ flex: 1, backgroundColor: 'white', paddingHorizontal: 20 }}>
+						<InlineButtons data={aisle} product={product} setData={setProduct} type='aisleType' />
+						<TextInput
+							style={styles.input}
+							mode='outlined'
+							dense
+							label='Aisle code'
+							value={product.aisleCode}
+							onChangeText={(aisleCode) => setProduct({ ...product, aisleCode })}
+						/>
 
-				<View style={{ flex: 1, backgroundColor: 'white', paddingHorizontal: 20 }}>
-					<View
-						style={{
-							marginTop: 5,
-							flexDirection: 'row',
-							flexWrap: 'wrap',
-							justifyContent: 'space-between',
-							alignItems: 'center',
-						}}
-					>
-						{[
-							{ label: 'Aisle', value: 'aisle' },
-							{ label: 'Produce', value: 'produce' },
-							{ label: 'Dairy', value: 'dairy' },
-							{ label: 'Meat', value: 'meat' },
-							{ label: 'Deli', value: 'deli' },
-							{ label: 'Bakery', value: 'bakery' },
-						].map((aisle, i) => (
-							<Button
-								disabled={product.aisleType !== aisle.value}
-								mode={product.aisleType === aisle.value ? 'contained' : 'outlined'}
-								dark
-								key={i}
-								compact
-								labelStyle={{ fontSize: 10, color: product.aisleType === aisle.value ? 'white' : 'gray' }}
-								onPress={() => {
-									if (product.aisleType === aisle.value) return;
+						{/* Take Picture */}
+						{/* <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+							<TextInput
+								style={[styles.input, { flex: 1 }]}
+								mode='outlined'
+								dense
+								label='filename...'
+								disabled
+								value={image.filename}
+							/>
 
-									setActive({
-										status: true,
-										index: i,
-									});
-									setProduct({ ...product, aisleType: aisle.value });
-								}}
-							>
-								{aisle.label}
-							</Button>
-						))}
+							{image.uri ? (
+								<IconButton
+									style={{ position: 'relative', top: 5 }}
+									icon='delete'
+									size={30}
+									color='red'
+									onPress={handleRetakePic}
+								/>
+							) : null}
+
+							<IconButton
+								style={{ position: 'relative', top: 5 }}
+								icon='camera'
+								size={30}
+								color={colors.primary}
+								onPress={() => setCameraType('camera')}
+							/>
+						</View> */}
+
+						<View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+							<TextInput
+								style={[styles.input, { width: '85%' }]}
+								mode='outlined'
+								dense
+								label='upc...'
+								disabled
+								value={product.upc}
+							/>
+
+							<IconButton
+								style={{ position: 'relative', top: 5 }}
+								icon='barcode-scan'
+								size={30}
+								color={colors.primary}
+								onPress={() => setCameraType('barcode')}
+							/>
+						</View>
+
+						<InlineButtons
+							containerStyle={{ justifyContent: 'flex-start' }}
+							label='Location'
+							data={btns}
+							product={product}
+							setData={setProduct}
+							type='memo'
+						/>
+
+						<Button
+							labelStyle={{ textTransform: 'capitalize' }}
+							style={{ marginTop: 10, padding: 5, backgroundColor: colors.primary }}
+							mode='contained'
+							onPress={handleSave}
+						>
+							Save
+						</Button>
 					</View>
-					<TextInput
-						multiline
-						style={styles.input}
-						mode='outlined'
-						dense
-						label='Product name'
-						value={product.productName}
-						onChangeText={(productName) => setProduct({ ...product, productName })}
-					/>
-					<TextInput
-						disabled={product.aisleCode && true}
-						style={styles.input}
-						mode='outlined'
-						dense
-						label='Aisle'
-						multiline
-						value={product?.aisleCode || ''}
-						onChangeText={(aisleCode) => setProduct({ ...product, aisleCode })}
-					/>
-
-					<TextInput style={styles.input} mode='outlined' dense label='upc...' disabled value={product.upc} />
-
-					<TextInput
-						style={styles.input}
-						mode='outlined'
-						dense
-						label='Size'
-						value={product.size}
-						onChangeText={(size) => setProduct({ ...product, size })}
-					/>
-					<TextInput
-						style={styles.input}
-						mode='outlined'
-						label='Memo (optional)'
-						placeholder='Look middle, top, or bottom?'
-						dense
-						multiline
-						value={product.memo}
-						onChangeText={(memo) => setProduct({ ...product, memo })}
-					/>
-
-					<Button
-						style={{ marginTop: 15, padding: 5 }}
-						labelStyle={{ textTransform: 'capitalize' }}
-						mode='contained'
-						onPress={handleUpdate}
-					>
-						Update
-					</Button>
-
-					<Button
-						disabled={product.upc ? false : true}
-						labelStyle={{ textTransform: 'capitalize' }}
-						style={{ marginTop: 10, padding: 5, backgroundColor: product.upc ? 'green' : colors.disabled }}
-						mode='contained'
-						onPress={() => setScan(true)}
-					>
-						Save
-					</Button>
-				</View>
-			</KeyboardAwareScrollView>
-			<Snackbar
-				style={{ backgroundColor: 'green' }}
-				duration={2000}
-				visible={visible}
-				onDismiss={() => setVisible(false)}
-			>
-				Batch successfully updated!
-			</Snackbar>
-		</>
-	) : (
-		<Camera handleScan={handleBarcodeScan} />
+					<Snackbar controller={visible} setVisible={() => setVisible({ status: false, message: '' })} />
+				</>
+			) : (
+				<Camera handleBarcodeScan={handleBarcodeScan} closeCamera={() => setCameraType(false)} type={cameraType} />
+			)}
+		</View>
 	);
 };
 
@@ -206,5 +180,4 @@ const styles = StyleSheet.create({
 		marginTop: 5,
 	},
 });
-
-export default EditBatchItem;
+export default UpdateBatchItem;

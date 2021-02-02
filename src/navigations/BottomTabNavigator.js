@@ -8,7 +8,6 @@ const BottomTab = createMaterialBottomTabNavigator();
 const BottomTabNavigator = () => {
 	return (
 		<BottomTab.Navigator
-			initialRouteName='Management'
 			shifting={true}
 			activeColor='#FFFFFF'
 			labelStyle={{ fontSize: 12 }}
