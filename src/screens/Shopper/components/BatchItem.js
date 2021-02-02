@@ -8,6 +8,60 @@ import { pageCrawler } from '../../../../config';
 import { saveProductToDB } from '../../../firebase';
 import axios from 'axios';
 
+const ControlButtons = (product) => {
+	const { status, id } = product;
+	let btns = {
+		btn1: '',
+		btn2: '',
+	};
+
+	if (status === 'looking') {
+		btns = {
+			btn1: 'Replace',
+			btn2: 'Found',
+		};
+	} else if (status === 'replace') {
+		btns = {
+			btn1: 'New',
+			btn2: 'Found',
+		};
+	} else if (status === 'found') {
+		btns = {
+			btn1: 'New',
+			btn2: 'Replace',
+		};
+	}
+
+	const onOptionClick = async (type) => {
+		await saveProductToDB({ ...product, status: type }, `batch/${id}`);
+	};
+
+	return (
+		status !== 'new' && (
+			<View style={styles.buttonContainer}>
+				<Button
+					mode='outlined'
+					compact
+					labelStyle={styles.buttonLabel}
+					onPress={() => onOptionClick(btns.btn1.toLowerCase())}
+				>
+					{btns.btn1}
+				</Button>
+
+				<Button
+					mode='outlined'
+					style={{ marginLeft: 10 }}
+					compact
+					labelStyle={styles.buttonLabel}
+					onPress={() => onOptionClick(btns.btn2.toLowerCase())}
+				>
+					{btns.btn2}
+				</Button>
+			</View>
+		)
+	);
+};
+
 const BatchItem = ({ product, onPress }) => {
 	const [{ store }] = useStateValue();
 	const navigation = useNavigation();
@@ -42,14 +96,6 @@ const BatchItem = ({ product, onPress }) => {
 		setIsSwitchOn(!isSwitchOn);
 	};
 
-	const onFound = async () => {
-		await saveProductToDB({ ...product, status: 'found' }, `batch/${product.id}`);
-	};
-
-	const onReplace = async () => {
-		await saveProductToDB({ ...product, status: 'replace' }, `batch/${product.id}`);
-	};
-
 	return (
 		<View
 			style={{
@@ -74,7 +120,7 @@ const BatchItem = ({ product, onPress }) => {
 			</TouchableOpacity>
 
 			<View style={{ flex: 1, paddingHorizontal: 20 }}>
-				{product.status !== 'management' && (
+				{(product.status === 'looking' || product.status === 'new') && (
 					<Switch
 						color='darkred'
 						style={{ alignSelf: 'flex-end', position: 'absolute' }}
@@ -94,16 +140,8 @@ const BatchItem = ({ product, onPress }) => {
 				<CustomText label={`Location - ${product?.memo}`} />
 			</View>
 
-			{product.status === 'looking' && (
-				<View style={styles.buttonContainer}>
-					<Button mode='outlined' compact labelStyle={styles.buttonLabel} onPress={onReplace}>
-						Replace
-					</Button>
-					<Button mode='outlined' labelStyle={styles.buttonLabel} onPress={onFound}>
-						Found
-					</Button>
-				</View>
-			)}
+			{ControlButtons(product)}
+
 			<Modal visible={viewImage} transparent={true} onRequestClose={() => setViewImage(false)}>
 				<ImageViewer
 					imageUrls={image}
@@ -128,10 +166,10 @@ const styles = StyleSheet.create({
 		backgroundColor: '#fff',
 		position: 'absolute',
 		alignSelf: 'flex-end',
-		width: Platform.OS === 'ios' ? 140 : 120,
-		left: Platform.OS === 'ios' ? '65%' : '70%',
-		justifyContent: 'space-between',
+		left: Platform.OS === 'ios' ? '73%' : '75%',
+		justifyContent: 'flex-end',
 		bottom: Platform.OS === 'ios' ? 0 : 1,
+		marginBottom: 5,
 	},
 
 	buttonLabel: {

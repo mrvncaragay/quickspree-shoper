@@ -9,7 +9,6 @@ const DoneItemList = ({ navigation }) => {
 
 	return (
 		<FlatList
-			contentContainerStyle={{ paddingBottom: 15 }}
 			showsHorizontalScrollIndicator={true}
 			data={batch.filter((b) => b.status === 'found').sort((a, b) => a.aisleCode > b.aisleCode)}
 			renderItem={({ item }) => (
