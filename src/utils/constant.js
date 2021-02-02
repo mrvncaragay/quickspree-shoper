@@ -6,7 +6,7 @@ export const productData = {
 		x: 0,
 		y: 0,
 	},
-	image: {},
+	uri: '',
 	upc: '',
 	size: '',
 	memo: '',

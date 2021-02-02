@@ -1,12 +1,19 @@
 import React, { useState } from 'react';
-import { View, TouchableOpacity, TouchableWithoutFeedback, Image, StyleSheet, Modal } from 'react-native';
-import { useTheme, Text } from 'react-native-paper';
+import { View, TouchableOpacity, Image, StyleSheet, Modal } from 'react-native';
+import { useTheme, Text, ActivityIndicator } from 'react-native-paper';
 import ImageViewer from 'react-native-image-zoom-viewer';
+import { useNavigation } from '@react-navigation/native';
+import { useStateValue } from '../context';
+import { pageCrawler } from '../../config';
+import axios from 'axios';
 
 const ProductItem = ({ product, onPress }) => {
+	const [{ store }] = useStateValue();
+	const navigation = useNavigation();
 	const { colors } = useTheme();
 	const [viewImage, setViewImage] = useState(false);
-	const image = [{ url: product.image.uri }];
+	const [searchImage, setSearhImage] = useState(false);
+	const image = [{ url: product?.uri ? product?.uri : '../../assets/camera/noImage.png' }];
 
 	const CustomText = ({ label, children, containerStyle }) => {
 		return (
@@ -15,6 +22,14 @@ const ProductItem = ({ product, onPress }) => {
 				<Text style={{ flex: 1, color: colors.dark600, fontSize: 16 }}>{children}</Text>
 			</View>
 		);
+	};
+
+	const handleSearchImage = async () => {
+		setSearhImage(true);
+		const response = await axios.get(pageCrawler(store.name, product.productName));
+
+		navigation.navigate('ImageSelect', { urls: response.data.urls, id: product.id });
+		setSearhImage(false);
 	};
 
 	return (
@@ -29,22 +44,22 @@ const ProductItem = ({ product, onPress }) => {
 				borderColor: 'lightgray',
 			}}
 		>
-			<TouchableWithoutFeedback onPress={() => setViewImage(true)}>
-				<Image
-					style={styles.small}
-					source={{
-						uri: product.image.uri,
-					}}
-				/>
-			</TouchableWithoutFeedback>
+			<TouchableOpacity onPress={() => (product?.uri ? setViewImage(true) : handleSearchImage())}>
+				{searchImage ? (
+					<ActivityIndicator style={{ width: 90, height: 90 }} size='large' />
+				) : (
+					<Image
+						style={styles.small}
+						source={product?.uri ? { uri: product.uri } : require('../../assets/camera/noImage.png')}
+					/>
+				)}
+			</TouchableOpacity>
 			<TouchableOpacity style={{ flex: 1 }} onPress={onPress}>
 				<View style={{ flex: 1, paddingHorizontal: 20 }}>
 					<CustomText containerStyle={{ flex: 1 }} title>
 						{product?.productName}
 						{'\n'}
-						<Text style={{ color: colors.backdrop, fontSize: 14 }}>
-							{!product?.size ? '' : '(' + product.size + ')'}
-						</Text>
+						<Text style={{ color: colors.backdrop, fontSize: 14 }}>{!product?.size ? '' : product.size}</Text>
 					</CustomText>
 
 					<CustomText label={`Aisle - ${product?.aisleCode}`} />
@@ -66,8 +81,8 @@ const ProductItem = ({ product, onPress }) => {
 
 const styles = StyleSheet.create({
 	small: {
-		width: 120,
-		height: 120,
+		width: 90,
+		height: 90,
 	},
 });
 
