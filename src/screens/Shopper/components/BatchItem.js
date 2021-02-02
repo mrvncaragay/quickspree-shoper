@@ -68,7 +68,7 @@ const BatchItem = ({ product, onPress }) => {
 	const { colors } = useTheme();
 	const [viewImage, setViewImage] = useState(false);
 	const [searchImage, setSearhImage] = useState(false);
-	const [isSwitchOn, setIsSwitchOn] = React.useState(false);
+	const [isSwitchOn, setIsSwitchOn] = useState(false);
 	const image = [{ url: product?.uri ? product?.uri : '../../../../assets/camera/noImage.png' }];
 
 	const CustomText = ({ label, children, containerStyle }) => {
@@ -140,7 +140,7 @@ const BatchItem = ({ product, onPress }) => {
 				<CustomText label={`Location - ${product?.memo}`} />
 			</View>
 
-			{ControlButtons(product)}
+			{product.status !== 'management' && ControlButtons(product)}
 
 			<Modal visible={viewImage} transparent={true} onRequestClose={() => setViewImage(false)}>
 				<ImageViewer
