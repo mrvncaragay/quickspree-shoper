@@ -100,15 +100,17 @@ const BatchItem = ({ product, onPress }) => {
 		<View
 			style={{
 				flexDirection: 'row',
-				flex: 1,
 				backgroundColor: 'white',
+				height: 150,
 				padding: 20,
-				height: 'auto',
 				borderTopWidth: 1,
 				borderColor: 'lightgray',
 			}}
 		>
-			<TouchableOpacity onPress={() => (product?.uri ? setViewImage(true) : handleSearchImage())}>
+			<TouchableOpacity
+				onPress={() => (product?.uri ? setViewImage(true) : handleSearchImage())}
+				style={{ flexDirection: 'row' }}
+			>
 				{searchImage ? (
 					<ActivityIndicator style={{ width: 90, height: 90 }} size='large' />
 				) : (
@@ -119,29 +121,22 @@ const BatchItem = ({ product, onPress }) => {
 				)}
 			</TouchableOpacity>
 
-			<View style={{ flex: 1, paddingHorizontal: 20 }}>
-				{(product.status === 'looking' || product.status === 'new') && (
-					<Switch
-						color='darkred'
-						style={{ alignSelf: 'flex-end', position: 'absolute' }}
-						value={product.status === 'looking'}
-						onValueChange={onToggleSwitch}
-					/>
-				)}
-				<TouchableOpacity style={{ flex: 1, width: 190 }} onPress={onPress}>
-					<CustomText containerStyle={{ flex: 1, width: 190 }} title>
-						{product?.productName}
-						{'\n'}
-						<Text style={{ color: colors.backdrop, fontSize: 14 }}>{!product?.size ? '' : product.size}</Text>
-					</CustomText>
-				</TouchableOpacity>
+			<TouchableOpacity style={{ flex: 1, width: 190, marginBottom: 5, paddingHorizontal: 5 }} onPress={onPress}>
+				<CustomText containerStyle={{ width: 190, marginBottom: 5 }} title>
+					<Text style={{ fontWeight: '600' }}>{product?.quantity} </Text>
+					{product?.productName}
+					{'\n'}
+					<Text style={{ color: colors.backdrop, fontSize: 14 }}>{!product?.size ? '' : product.size}</Text>
+				</CustomText>
 
-				<CustomText label={`Aisle - ${product?.aisleCode}`} />
-				<CustomText label={`Location - ${product?.memo}`} />
-			</View>
+				<CustomText label={`${product?.aisleCode} ${product?.memo ? '- ' + product?.memo : ''}`} />
+			</TouchableOpacity>
+
+			{(product.status === 'looking' || product.status === 'new') && (
+				<Switch color='darkred' value={product.status === 'looking'} onValueChange={onToggleSwitch} />
+			)}
 
 			{product.status !== 'management' && ControlButtons(product)}
-
 			<Modal visible={viewImage} transparent={true} onRequestClose={() => setViewImage(false)}>
 				<ImageViewer
 					imageUrls={image}
@@ -165,10 +160,8 @@ const styles = StyleSheet.create({
 		flexDirection: 'row',
 		backgroundColor: '#fff',
 		position: 'absolute',
-		alignSelf: 'flex-end',
-		left: Platform.OS === 'ios' ? '73%' : '75%',
-		justifyContent: 'flex-end',
-		bottom: Platform.OS === 'ios' ? 0 : 1,
+		left: '72%',
+		top: 100,
 		marginBottom: 5,
 	},
 

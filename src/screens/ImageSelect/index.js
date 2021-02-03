@@ -12,7 +12,7 @@ const ImageContainer = ({ navigation, url, id }) => {
 	const updateProductImage = async () => {
 		const product = batch.filter((p) => p.id === id)[0];
 		delete product.id;
-		const newUrl = url.replace('197x', '297x');
+		const newUrl = url.replace('197x', '697x');
 		await saveProductToDB({ ...product, uri: newUrl }, `batch/${id}`);
 		navigation.goBack();
 	};

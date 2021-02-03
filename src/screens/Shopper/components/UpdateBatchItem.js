@@ -171,6 +171,15 @@ const UpdateBatchItem = ({ navigation, route }) => {
 							style={styles.input}
 							mode='outlined'
 							dense
+							label='Quantity'
+							value={product.quantity}
+							onChangeText={(quantity) => setProduct({ ...product, quantity })}
+						/>
+
+						<TextInput
+							style={styles.input}
+							mode='outlined'
+							dense
 							label='Size'
 							value={product.size}
 							onChangeText={(size) => setProduct({ ...product, size })}
