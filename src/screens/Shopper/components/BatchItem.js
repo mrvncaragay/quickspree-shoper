@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, TouchableOpacity, Image, StyleSheet, Modal, Platform } from 'react-native';
+import { View, TouchableOpacity, Image, StyleSheet, Modal } from 'react-native';
 import { useTheme, Text, ActivityIndicator, Switch, Button } from 'react-native-paper';
 import ImageViewer from 'react-native-image-zoom-viewer';
 import { useNavigation } from '@react-navigation/native';

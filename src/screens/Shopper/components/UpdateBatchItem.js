@@ -81,12 +81,24 @@ const UpdateBatchItem = ({ navigation, route }) => {
 		const id = updatedProduct.id;
 		delete updatedProduct.status;
 		delete updatedProduct.id;
+		delete updatedProduct.quantity;
 		await saveProductToDB(updatedProduct, `products/${product.productName}`);
 		await deleteProductToDB(`batch/${id}`);
 
 		setVisible({
 			status: 'true',
 			message: 'Successfully saved to DB.',
+		});
+
+		setTimeout(() => navigation.goBack(), 1000);
+	};
+
+	const handleDelete = async () => {
+		await deleteProductToDB(`batch/${product.id}`);
+
+		setVisible({
+			status: 'true',
+			message: 'Successfully removed from the batch.',
 		});
 
 		setTimeout(() => navigation.goBack(), 1000);
@@ -215,14 +227,24 @@ const UpdateBatchItem = ({ navigation, route }) => {
 						)}
 
 						{product.status === 'management' && (
-							<Button
-								labelStyle={{ textTransform: 'capitalize' }}
-								style={{ marginTop: 10, padding: 5, backgroundColor: colors.primary }}
-								mode='contained'
-								onPress={handleUploadToDB}
-							>
-								Upload
-							</Button>
+							<>
+								<Button
+									labelStyle={{ textTransform: 'capitalize' }}
+									style={{ marginTop: 10, padding: 5, backgroundColor: 'darkorange' }}
+									mode='contained'
+									onPress={handleDelete}
+								>
+									Delete
+								</Button>
+								<Button
+									labelStyle={{ textTransform: 'capitalize' }}
+									style={{ marginTop: 10, padding: 5, backgroundColor: 'green' }}
+									mode='contained'
+									onPress={handleUploadToDB}
+								>
+									Upload
+								</Button>
+							</>
 						)}
 					</View>
 					<Snackbar controller={visible} setVisible={() => setVisible({ status: false, message: '' })} />
