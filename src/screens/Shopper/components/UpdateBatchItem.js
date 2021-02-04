@@ -105,37 +105,35 @@ const UpdateBatchItem = ({ navigation, route }) => {
 		setTimeout(() => navigation.goBack(), 1000);
 	};
 
-	return (
-		<View style={[styles.container, !store && { justifyContent: 'center', alignItems: 'center' }]}>
-			{!cameraType ? (
-				<KeyboardAwareScrollView>
-					{!store.hasAisleHelper && (
-						<>
-							<StoreMap store={store} product={product} handleLocation={handleLocation} isForm />
-							<InlineButtons data={aisle} product={product} setData={setProduct} type='aisleType' />
-						</>
-					)}
-					<View style={{ flex: 1, backgroundColor: 'white', paddingHorizontal: 20 }}>
-						<TextInput
-							multiline
-							style={styles.input}
-							mode='outlined'
-							dense
-							label='Product name'
-							value={product.productName}
-							onChangeText={(productName) => setProduct({ ...product, productName })}
-						/>
-						<TextInput
-							style={styles.input}
-							mode='outlined'
-							dense
-							label='Aisle code'
-							value={product.aisleCode}
-							onChangeText={(aisleCode) => setProduct({ ...product, aisleCode })}
-						/>
+	return !cameraType ? (
+		<KeyboardAwareScrollView>
+			{!store.hasAisleHelper && (
+				<>
+					<StoreMap store={store} product={product} handleLocation={handleLocation} isForm />
+					<InlineButtons data={aisle} product={product} setData={setProduct} type='aisleType' />
+				</>
+			)}
+			<View style={{ backgroundColor: 'white', paddingHorizontal: 20 }}>
+				<TextInput
+					multiline
+					style={styles.input}
+					mode='outlined'
+					dense
+					label='Product name'
+					value={product.productName}
+					onChangeText={(productName) => setProduct({ ...product, productName })}
+				/>
+				<TextInput
+					style={styles.input}
+					mode='outlined'
+					dense
+					label='Aisle code'
+					value={product.aisleCode}
+					onChangeText={(aisleCode) => setProduct({ ...product, aisleCode })}
+				/>
 
-						{/* Take Picture */}
-						{/* <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+				{/* Take Picture */}
+				{/* <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
 							<TextInput
 								style={[styles.input, { flex: 1 }]}
 								mode='outlined'
@@ -164,99 +162,101 @@ const UpdateBatchItem = ({ navigation, route }) => {
 							/>
 						</View> */}
 
-						<View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-							<TextInput
-								style={[styles.input, { width: '85%' }]}
-								mode='outlined'
-								dense
-								label='upc...'
-								value={product.upc}
-								onChangeText={(upc) => setProduct({ ...product, upc })}
-							/>
+				<View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+					<TextInput
+						style={[styles.input, { width: '85%' }]}
+						mode='outlined'
+						dense
+						label='upc...'
+						value={product.upc}
+						onChangeText={(upc) => setProduct({ ...product, upc })}
+					/>
 
-							<IconButton
-								style={{ position: 'relative', top: 5 }}
-								icon='barcode-scan'
-								size={30}
-								color={colors.primary}
-								onPress={() => setCameraType('barcode')}
-							/>
-						</View>
+					<IconButton
+						style={{ position: 'relative', top: 5 }}
+						icon='barcode-scan'
+						size={30}
+						color={colors.primary}
+						onPress={() => setCameraType('barcode')}
+					/>
+				</View>
 
-						<TextInput
-							style={styles.input}
-							mode='outlined'
-							dense
-							label='Quantity'
-							value={product.quantity}
-							onChangeText={(quantity) => setProduct({ ...product, quantity })}
-						/>
+				<TextInput
+					style={styles.input}
+					mode='outlined'
+					dense
+					label='Quantity'
+					value={product.quantity}
+					onChangeText={(quantity) => setProduct({ ...product, quantity })}
+				/>
 
-						<TextInput
-							style={styles.input}
-							mode='outlined'
-							dense
-							label='Size'
-							value={product.size}
-							onChangeText={(size) => setProduct({ ...product, size })}
-						/>
+				<TextInput
+					style={styles.input}
+					mode='outlined'
+					dense
+					label='Size'
+					value={product.size}
+					onChangeText={(size) => setProduct({ ...product, size })}
+				/>
 
-						<InlineButtons
-							containerStyle={{ justifyContent: 'flex-start' }}
-							label='Location'
-							data={btns}
-							product={product}
-							setData={setProduct}
-							type='memo'
-						/>
+				<InlineButtons
+					containerStyle={{ justifyContent: 'flex-start' }}
+					label='Location'
+					data={btns}
+					product={product}
+					setData={setProduct}
+					type='memo'
+				/>
 
+				<Button
+					labelStyle={{ textTransform: 'capitalize', alignSelf: 'center', flex: 1 }}
+					style={{
+						marginTop: 10,
+						padding: 5,
+						backgroundColor: colors.primary,
+					}}
+					mode='contained'
+					onPress={handleSave}
+				>
+					Save
+				</Button>
+
+				{product.status === 'found' && (
+					<Button
+						labelStyle={{ textTransform: 'capitalize' }}
+						style={{ marginTop: 10, padding: 5, backgroundColor: colors.primary }}
+						mode='contained'
+						onPress={handleManagement}
+					>
+						Move to Management
+					</Button>
+				)}
+
+				{product.status === 'management' && (
+					<>
 						<Button
 							labelStyle={{ textTransform: 'capitalize' }}
-							style={{ marginTop: 10, padding: 5, backgroundColor: colors.primary }}
+							style={{ marginTop: 10, padding: 5, backgroundColor: 'darkorange' }}
 							mode='contained'
-							onPress={handleSave}
+							onPress={handleDelete}
 						>
-							Save
+							Delete
 						</Button>
-
-						{product.status === 'found' && (
-							<Button
-								labelStyle={{ textTransform: 'capitalize' }}
-								style={{ marginTop: 10, padding: 5, backgroundColor: colors.primary }}
-								mode='contained'
-								onPress={handleManagement}
-							>
-								Move to Management
-							</Button>
-						)}
-
-						{product.status === 'management' && (
-							<>
-								<Button
-									labelStyle={{ textTransform: 'capitalize' }}
-									style={{ marginTop: 10, padding: 5, backgroundColor: 'darkorange' }}
-									mode='contained'
-									onPress={handleDelete}
-								>
-									Delete
-								</Button>
-								<Button
-									labelStyle={{ textTransform: 'capitalize' }}
-									style={{ marginTop: 10, padding: 5, backgroundColor: 'green' }}
-									mode='contained'
-									onPress={handleUploadToDB}
-								>
-									Upload
-								</Button>
-							</>
-						)}
-					</View>
-					<Snackbar controller={visible} setVisible={() => setVisible({ status: false, message: '' })} />
-				</KeyboardAwareScrollView>
-			) : (
-				<Camera handleBarcodeScan={handleBarcodeScan} closeCamera={() => setCameraType(false)} type={cameraType} />
-			)}
-		</View>
+						<Button
+							labelStyle={{ textTransform: 'capitalize' }}
+							style={{ marginTop: 10, padding: 5, backgroundColor: 'green' }}
+							mode='contained'
+							onPress={handleUploadToDB}
+						>
+							Upload
+						</Button>
+					</>
+				)}
+			</View>
+			<Snackbar controller={visible} setVisible={() => setVisible({ status: false, message: '' })} />
+		</KeyboardAwareScrollView>
+	) : (
+		<Camera handleBarcodeScan={handleBarcodeScan} closeCamera={() => setCameraType(false)} type={cameraType} />
 	);
 };
 

@@ -6,7 +6,7 @@ import { useNavigation } from '@react-navigation/native';
 import { useStateValue } from '../../../context';
 import { pageCrawler } from '../../../../config';
 import { saveProductToDB, saveBatchTempImagesToDB } from '../../../firebase';
-import { Entypo } from '@expo/vector-icons';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 import axios from 'axios';
 
 const ControlButtons = (product) => {
@@ -116,8 +116,8 @@ const BatchItem = ({ product, onPress }) => {
 			{searchImage ? (
 				<ActivityIndicator style={{ width: 90, height: 90 }} size='large' />
 			) : tempImages.length > 0 ? (
-				<Entypo
-					name='images'
+				<MaterialCommunityIcons
+					name='image-search-outline'
 					size={70}
 					color='gray'
 					style={[
@@ -138,15 +138,15 @@ const BatchItem = ({ product, onPress }) => {
 				</TouchableOpacity>
 			)}
 
-			<TouchableOpacity style={{ flex: 1, width: 190, marginBottom: 5, paddingHorizontal: 5 }} onPress={onPress}>
-				<CustomText containerStyle={{ width: 190, marginBottom: 5 }} title>
+			<TouchableOpacity style={{ flex: 1, width: 190, paddingHorizontal: 5 }} onPress={onPress}>
+				<CustomText containerStyle={{ width: 190 }} title>
 					<Text style={{ fontWeight: '600' }}>{product?.quantity} </Text>
 					{product?.productName}
 					{'\n'}
 					<Text style={{ color: colors.backdrop, fontSize: 14 }}>{!product?.size ? '' : product.size}</Text>
 				</CustomText>
 
-				<CustomText label={`${product?.aisleCode} ${product?.memo ? '- ' + product?.memo : ''}`} />
+				<CustomText label={`${product?.aisleCode || ''} ${product?.memo ? '- ' + product?.memo : ''}`} />
 			</TouchableOpacity>
 
 			{(product.status === 'looking' || product.status === 'new') && (
@@ -179,7 +179,6 @@ const styles = StyleSheet.create({
 		position: 'absolute',
 		left: '72%',
 		top: 100,
-		marginBottom: 5,
 	},
 
 	buttonLabel: {
