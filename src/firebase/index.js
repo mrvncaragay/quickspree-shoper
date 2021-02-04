@@ -28,6 +28,24 @@ export const saveProductToDB = (product, path) => {
 	});
 };
 
+// save batch item temp images to db
+export const saveBatchTempImagesToDB = (images, path) => {
+	return new Promise(async (resolve, reject) => {
+		const batchRef = firebase.database().ref(path);
+
+		images.forEach((image) => {
+			const url = image.replace('197x', '697x');
+			batchRef.push().set(url, async (error) => {
+				if (error) {
+					reject(error);
+				} else {
+					resolve();
+				}
+			});
+		});
+	});
+};
+
 // delete product
 export const deleteProductToDB = (path) => {
 	return new Promise(async (resolve, reject) => {

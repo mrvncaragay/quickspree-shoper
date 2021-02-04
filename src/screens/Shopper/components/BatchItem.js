@@ -5,7 +5,8 @@ import ImageViewer from 'react-native-image-zoom-viewer';
 import { useNavigation } from '@react-navigation/native';
 import { useStateValue } from '../../../context';
 import { pageCrawler } from '../../../../config';
-import { saveProductToDB } from '../../../firebase';
+import { saveProductToDB, saveBatchTempImagesToDB } from '../../../firebase';
+import { Entypo } from '@expo/vector-icons';
 import axios from 'axios';
 
 const ControlButtons = (product) => {
@@ -70,6 +71,11 @@ const BatchItem = ({ product, onPress }) => {
 	const [searchImage, setSearhImage] = useState(false);
 	const [isSwitchOn, setIsSwitchOn] = useState(false);
 	const image = [{ url: product?.uri ? product?.uri : '../../../../assets/camera/noImage.png' }];
+	const tempImages = [];
+
+	for (let key in product.images) {
+		tempImages.push(product.images[key]);
+	}
 
 	const CustomText = ({ label, children, containerStyle }) => {
 		return (
@@ -85,7 +91,7 @@ const BatchItem = ({ product, onPress }) => {
 		const response = await axios.get(pageCrawler(store.name, product.productName));
 
 		if (response.data?.urls) {
-			navigation.navigate('ImageSelect', { urls: response.data.urls, id: product.id });
+			saveBatchTempImagesToDB(response.data.urls, `batch/${product.id}/images`);
 		}
 
 		setSearhImage(false);
@@ -107,19 +113,30 @@ const BatchItem = ({ product, onPress }) => {
 				borderColor: 'lightgray',
 			}}
 		>
-			<TouchableOpacity
-				onPress={() => (product?.uri ? setViewImage(true) : handleSearchImage())}
-				style={{ flexDirection: 'row' }}
-			>
-				{searchImage ? (
-					<ActivityIndicator style={{ width: 90, height: 90 }} size='large' />
-				) : (
+			{searchImage ? (
+				<ActivityIndicator style={{ width: 90, height: 90 }} size='large' />
+			) : tempImages.length > 0 ? (
+				<Entypo
+					name='images'
+					size={70}
+					color='gray'
+					style={[
+						styles.small,
+						{
+							padding: 5,
+							alignSelf: 'center',
+						},
+					]}
+					onPress={() => navigation.navigate('ImageSelect', { urls: tempImages, id: product.id })}
+				/>
+			) : (
+				<TouchableOpacity onPress={() => (product?.uri ? setViewImage(true) : handleSearchImage())}>
 					<Image
 						style={styles.small}
 						source={product?.uri ? { uri: product.uri } : require('../../../../assets/camera/noImage.png')}
 					/>
-				)}
-			</TouchableOpacity>
+				</TouchableOpacity>
+			)}
 
 			<TouchableOpacity style={{ flex: 1, width: 190, marginBottom: 5, paddingHorizontal: 5 }} onPress={onPress}>
 				<CustomText containerStyle={{ width: 190, marginBottom: 5 }} title>

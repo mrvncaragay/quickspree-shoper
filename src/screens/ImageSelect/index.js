@@ -1,19 +1,22 @@
-import React from 'react';
-import { FlatList, Image, StyleSheet, View, Platform } from 'react-native';
+import React, { useState } from 'react';
+import { FlatList, Image, StyleSheet, View, Platform, Modal, TouchableOpacity } from 'react-native';
 import { Divider, useTheme } from 'react-native-paper';
 import { Fontisto } from '@expo/vector-icons';
 import { useStateValue } from '../../context';
 import { saveProductToDB } from '../../firebase';
+import ImageViewer from 'react-native-image-zoom-viewer';
 
 const ImageContainer = ({ navigation, url, id }) => {
 	const [{ batch }] = useStateValue();
 	const { colors } = useTheme();
+	const [viewImage, setViewImage] = useState(false);
+	const image = [{ url }];
 
 	const updateProductImage = async () => {
 		const product = batch.filter((p) => p.id === id)[0];
 		delete product.id;
-		const newUrl = url.replace('197x', '697x');
-		await saveProductToDB({ ...product, uri: newUrl }, `batch/${id}`);
+		delete product.images;
+		await saveProductToDB({ ...product, uri: url }, `batch/${id}`);
 		navigation.goBack();
 	};
 
@@ -27,10 +30,13 @@ const ImageContainer = ({ navigation, url, id }) => {
 				backgroundColor: '#fff',
 			}}
 		>
-			<Image
-				style={styles.small}
-				source={Platform.OS === 'ios' ? { url: url.toLowerCase() } : { uri: url.toLowerCase() }}
-			/>
+			<TouchableOpacity onPress={() => setViewImage(true)}>
+				<Image
+					style={styles.small}
+					source={Platform.OS === 'ios' ? { url: url.toLowerCase() } : { uri: url.toLowerCase() }}
+				/>
+			</TouchableOpacity>
+
 			<Fontisto
 				name='angle-right'
 				color={colors.primary}
@@ -38,6 +44,15 @@ const ImageContainer = ({ navigation, url, id }) => {
 				style={{ width: 35 }}
 				onPress={updateProductImage}
 			/>
+			<Modal visible={viewImage} transparent={true} onRequestClose={() => setViewImage(false)}>
+				<ImageViewer
+					imageUrls={image}
+					renderIndicator={() => null}
+					onSwipeDown={() => setViewImage(false)}
+					enableSwipeDown
+					backgroundColor='white'
+				/>
+			</Modal>
 		</View>
 	);
 };

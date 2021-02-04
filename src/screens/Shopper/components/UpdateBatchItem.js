@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { View, StyleSheet } from 'react-native';
 import { useTheme, TextInput, Button, IconButton } from 'react-native-paper';
 import { Camera, StoreMap, InlineButtons, Snackbar } from '../../../components';
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 // import * as ImageManipulator from 'expo-image-manipulator';
 import { useStateValue } from '../../../context';
 import { aisle, btns } from '../../../utils/constant';
@@ -82,7 +83,7 @@ const UpdateBatchItem = ({ navigation, route }) => {
 		delete updatedProduct.status;
 		delete updatedProduct.id;
 		delete updatedProduct.quantity;
-		await saveProductToDB(updatedProduct, `products/${product.productName}`);
+		await saveProductToDB(updatedProduct, `products/${product.productName.toLowerCase()}`);
 		await deleteProductToDB(`batch/${id}`);
 
 		setVisible({
@@ -107,11 +108,14 @@ const UpdateBatchItem = ({ navigation, route }) => {
 	return (
 		<View style={[styles.container, !store && { justifyContent: 'center', alignItems: 'center' }]}>
 			{!cameraType ? (
-				<>
-					<StoreMap store={store} product={product} handleLocation={handleLocation} isForm />
-
+				<KeyboardAwareScrollView>
+					{!store.hasAisleHelper && (
+						<>
+							<StoreMap store={store} product={product} handleLocation={handleLocation} isForm />
+							<InlineButtons data={aisle} product={product} setData={setProduct} type='aisleType' />
+						</>
+					)}
 					<View style={{ flex: 1, backgroundColor: 'white', paddingHorizontal: 20 }}>
-						<InlineButtons data={aisle} product={product} setData={setProduct} type='aisleType' />
 						<TextInput
 							multiline
 							style={styles.input}
@@ -248,7 +252,7 @@ const UpdateBatchItem = ({ navigation, route }) => {
 						)}
 					</View>
 					<Snackbar controller={visible} setVisible={() => setVisible({ status: false, message: '' })} />
-				</>
+				</KeyboardAwareScrollView>
 			) : (
 				<Camera handleBarcodeScan={handleBarcodeScan} closeCamera={() => setCameraType(false)} type={cameraType} />
 			)}
