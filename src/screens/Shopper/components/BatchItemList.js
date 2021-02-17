@@ -1,21 +1,24 @@
 import React, { useEffect } from 'react';
 import { FlatList } from 'react-native';
 import { Divider } from 'react-native-paper';
-import BatchItem from './BatchItem';
+import { BatchItem } from '../../../components';
 import { useStateValue } from '../../../context';
 import firebase from '../../../firebase';
 
 const BatchItems = ({ navigation }) => {
 	const [{ batch }, dispatch] = useStateValue();
 
+	// Fetch and listen to batch state in the DB
 	useEffect(() => {
 		const batchesRef = firebase.database().ref(`batch`);
 		batchesRef.on('value', (snapshot) => {
 			const dbBatches = snapshot.val();
 			const batchState = [];
+
 			for (let key in dbBatches) {
 				batchState.push({ id: key, ...dbBatches[key] });
 			}
+
 			dispatch({ type: 'setBatch', value: batchState });
 		});
 	}, []);

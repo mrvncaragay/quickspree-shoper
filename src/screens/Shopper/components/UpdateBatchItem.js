@@ -3,7 +3,6 @@ import { View, StyleSheet } from 'react-native';
 import { useTheme, TextInput, Button, IconButton } from 'react-native-paper';
 import { Camera, StoreMap, InlineButtons, Snackbar } from '../../../components';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
-// import * as ImageManipulator from 'expo-image-manipulator';
 import { useStateValue } from '../../../context';
 import { aisle, btns } from '../../../utils/constant';
 import { saveProductToDB, deleteProductToDB } from '../../../firebase';
@@ -34,27 +33,6 @@ const UpdateBatchItem = ({ navigation, route }) => {
 		});
 	};
 
-	// const handleTakePicture = async (img) => {
-	// 	const compressedImg = await ImageManipulator.manipulateAsync(img.uri, [{ resize: { width: 400, height: 600 } }], {
-	// 		compress: 1,
-	// 		format: ImageManipulator.SaveFormat.PNG,
-	// 	});
-	// 	const filename = compressedImg.uri.substring(compressedImg.uri.lastIndexOf('/') + 1);
-	// 	setImage({
-	// 		filename,
-	// 		uri: compressedImg.uri,
-	// 	});
-
-	// 	setCameraType(false);
-	// };
-
-	// const handleRetakePic = () => {
-	// 	setImage({
-	// 		filename: '',
-	// 		uri: '',
-	// 	});
-	// };
-
 	const handleSave = async () => {
 		await saveProductToDB(product, `batch/${product.id}`);
 
@@ -83,6 +61,13 @@ const UpdateBatchItem = ({ navigation, route }) => {
 		delete updatedProduct.status;
 		delete updatedProduct.id;
 		delete updatedProduct.quantity;
+		delete updatedProduct.size;
+
+		if (store.hasAisleHelper) {
+			delete updatedProduct.location;
+			delete updatedProduct.aisleType;
+		}
+
 		await saveProductToDB(updatedProduct, `products/${product.productName.toLowerCase()}`);
 		await deleteProductToDB(`batch/${id}`);
 
@@ -131,36 +116,6 @@ const UpdateBatchItem = ({ navigation, route }) => {
 					value={product.aisleCode}
 					onChangeText={(aisleCode) => setProduct({ ...product, aisleCode })}
 				/>
-
-				{/* Take Picture */}
-				{/* <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-							<TextInput
-								style={[styles.input, { flex: 1 }]}
-								mode='outlined'
-								dense
-								label='filename...'
-								disabled
-								value={image.filename}
-							/>
-
-							{image.uri ? (
-								<IconButton
-									style={{ position: 'relative', top: 5 }}
-									icon='delete'
-									size={30}
-									color='red'
-									onPress={handleRetakePic}
-								/>
-							) : null}
-
-							<IconButton
-								style={{ position: 'relative', top: 5 }}
-								icon='camera'
-								size={30}
-								color={colors.primary}
-								onPress={() => setCameraType('camera')}
-							/>
-						</View> */}
 
 				<View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
 					<TextInput
@@ -256,7 +211,7 @@ const UpdateBatchItem = ({ navigation, route }) => {
 			<Snackbar controller={visible} setVisible={() => setVisible({ status: false, message: '' })} />
 		</KeyboardAwareScrollView>
 	) : (
-		<Camera handleBarcodeScan={handleBarcodeScan} closeCamera={() => setCameraType(false)} type={cameraType} />
+		<Camera handleBarcodeScan={handleBarcodeScan} closeCamera={() => setCameraType(false)} />
 	);
 };
 

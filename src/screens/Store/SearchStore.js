@@ -8,6 +8,7 @@ import firebase from '../../firebase';
 const Store = ({ store, navigation }) => {
 	const [_, dispatch] = useStateValue();
 	const { colors } = useTheme();
+
 	return (
 		<TouchableRipple
 			onPress={() => {
@@ -18,8 +19,8 @@ const Store = ({ store, navigation }) => {
 		>
 			<Surface style={styles.store}>
 				<View>
-					<Text>{`${store.city}, ${store.state}`}</Text>
-					<Text style={{ color: 'gray' }}>{`${store.name} - #${store.storeNumber}`}</Text>
+					<Text>{`${store.name} - #${store.storeNumber}`}</Text>
+					<Text style={{ color: 'gray' }}>{`${store.city}, ${store.state}`}</Text>
 				</View>
 
 				<IconButton

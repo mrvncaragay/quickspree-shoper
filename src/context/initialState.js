@@ -39,7 +39,7 @@ export const StateReducer = (state, action) => {
 };
 
 export const InitialState = {
-	store: '',
+	store: null,
 	batch: [],
 	done: [],
 	replacement: [],

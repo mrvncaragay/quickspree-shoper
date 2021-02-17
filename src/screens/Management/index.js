@@ -1,7 +1,7 @@
 import React from 'react';
 import { FlatList } from 'react-native';
 import { Divider } from 'react-native-paper';
-import BatchItem from '../Shopper/components/BatchItem';
+import { BatchItem } from '../../components';
 import { useStateValue } from '../../context';
 
 const Management = ({ navigation }) => {
