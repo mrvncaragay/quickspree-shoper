@@ -62,7 +62,7 @@ const BatchItem = ({ product, onPress }) => {
 	const { colors } = useTheme();
 	const [viewImage, setViewImage] = useState(false);
 	const [isSwitchOn, setIsSwitchOn] = useState(false);
-	const productUrl = product.urls[0]; // product must have an image
+	const productUrl = product?.urls ? { uri: product.urls[0] } : require('../../assets/camera/noImage.png');
 
 	const CustomText = ({ label, children, containerStyle }) => {
 		return (
@@ -90,10 +90,7 @@ const BatchItem = ({ product, onPress }) => {
 			}}
 		>
 			<TouchableOpacity onPress={() => (productUrl ? setViewImage(true) : null)}>
-				<Image
-					style={styles.small}
-					source={product?.urls[0] ? { uri: productUrl } : require('../../assets/camera/noImage.png')}
-				/>
+				<Image style={styles.small} source={productUrl} />
 			</TouchableOpacity>
 
 			<TouchableOpacity style={{ flex: 1, width: 190, paddingHorizontal: 5 }} onPress={onPress}>

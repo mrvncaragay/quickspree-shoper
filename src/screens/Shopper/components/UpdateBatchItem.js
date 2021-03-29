@@ -119,6 +119,7 @@ const UpdateBatchItem = ({ navigation, route }) => {
 
 				<View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
 					<TextInput
+						disabled
 						style={[styles.input, { width: '85%' }]}
 						mode='outlined'
 						dense
@@ -179,15 +180,15 @@ const UpdateBatchItem = ({ navigation, route }) => {
 				{product.status === 'found' && (
 					<Button
 						labelStyle={{ textTransform: 'capitalize' }}
-						style={{ marginTop: 10, padding: 5, backgroundColor: colors.primary }}
+						style={{ marginTop: 10, padding: 5, backgroundColor: 'green' }}
 						mode='contained'
-						onPress={handleManagement}
+						onPress={handleUploadToDB}
 					>
-						Move to Management
+						Upload
 					</Button>
 				)}
 
-				{product.status === 'management' && (
+				{/* {product.status === 'management' && (
 					<>
 						<Button
 							labelStyle={{ textTransform: 'capitalize' }}
@@ -206,7 +207,7 @@ const UpdateBatchItem = ({ navigation, route }) => {
 							Upload
 						</Button>
 					</>
-				)}
+				)} */}
 			</View>
 			<Snackbar controller={visible} setVisible={() => setVisible({ status: false, message: '' })} />
 		</KeyboardAwareScrollView>
