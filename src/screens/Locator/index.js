@@ -1,15 +1,18 @@
 import React, { useEffect } from 'react';
-import { View, StyleSheet } from 'react-native';
+import { View, StyleSheet, Text } from 'react-native';
 import { useTheme } from 'react-native-paper';
 import { Header as HeaderComponent, SelectStore } from '../../components';
 import { useStateValue } from '../../context';
 import { readData } from '../../utils/asyncStorage';
+import { useRoute } from '@react-navigation/native';
 
 import Search from './components/Search';
+import Management from './components/Management';
 
 const Shopper = ({ navigation }) => {
 	const [{ store }, dispatch] = useStateValue();
 	const { colors } = useTheme();
+	const route = useRoute();
 
 	// Fetch store data in local storage
 	useEffect(() => {
@@ -26,7 +29,7 @@ const Shopper = ({ navigation }) => {
 			{store ? (
 				<>
 					<HeaderComponent store={store} colors={colors} navigation={navigation} />
-					<Search />
+					{route.name === 'Locator' ? <Search /> : <Management />}
 				</>
 			) : (
 				<SelectStore colors={colors} navigation={navigation} />
