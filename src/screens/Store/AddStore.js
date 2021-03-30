@@ -1,16 +1,23 @@
 import React, { useState } from 'react';
 import { View, StyleSheet } from 'react-native';
 import { Title, TextInput, Button, ActivityIndicator } from 'react-native-paper';
+import { Snackbar } from '../../components';
 import firebase from '../../firebase';
 
-const AddStore = ({ navigation }) => {
-	const [store, setStore] = useState({
-		name: '',
-		city: '',
-		state: '',
-		zipcode: '',
-		storeNumber: null,
-		hasAisleHelper: null,
+const defaultStore = {
+	name: '',
+	city: '',
+	state: '',
+	zipcode: '',
+	storeNumber: null,
+	// hasAisleHelper: null,
+};
+
+const AddStore = () => {
+	const [store, setStore] = useState(defaultStore);
+	const [visible, setVisible] = useState({
+		status: false,
+		message: '',
 	});
 
 	const [loading, setLoading] = useState(false);
@@ -27,7 +34,11 @@ const AddStore = ({ navigation }) => {
 				console.log(error);
 			} else {
 				setLoading(false);
-				navigation.goBack();
+				setStore(defaultStore);
+				setVisible({
+					status: 'true',
+					message: 'Successfully save.',
+				});
 			}
 		});
 	};
@@ -71,7 +82,7 @@ const AddStore = ({ navigation }) => {
 					value={store.storeNumber}
 					onChangeText={(storeNumber) => setStore({ ...store, storeNumber })}
 				/>
-				<TextInput
+				{/* <TextInput
 					style={{ marginVertical: 5 }}
 					mode='outlined'
 					label='Has aisle helper?'
@@ -80,11 +91,12 @@ const AddStore = ({ navigation }) => {
 					onChangeText={(hasAisleHelper) =>
 						setStore({ ...store, hasAisleHelper: hasAisleHelper.toLowerCase() === 'True' })
 					}
-				/>
+				/> */}
 
 				<Button style={{ marginTop: 15, padding: 5 }} mode='contained' onPress={handleSubmit}>
-					{loading ? <ActivityIndicator animating color='white' /> : 'Create'}
+					{loading ? <ActivityIndicator animating color='white' /> : 'Save'}
 				</Button>
+				<Snackbar controller={visible} setVisible={() => setVisible({ status: false, message: '' })} />
 			</View>
 		</View>
 	);
