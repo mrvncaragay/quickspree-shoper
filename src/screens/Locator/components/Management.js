@@ -1,24 +1,25 @@
 import React, { useState } from 'react';
-import { View, StyleSheet, Image, TouchableWithoutFeedback } from 'react-native';
+import { View, StyleSheet, Image, TouchableWithoutFeedback, Modal } from 'react-native';
 import { TextInput, Button, ActivityIndicator } from 'react-native-paper';
 import { Snackbar } from '../../../components';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
-// import { useStateValue } from '../../../context';
+import ImageViewer from 'react-native-image-zoom-viewer';
+import { useStateValue } from '../../../context';
 // import { storeData } from '../../../utils/asyncStorage';
-// import { pageCrawler } from '../../../../config';
+import { pageCrawler } from '../../../../config';
 import axios from 'axios';
 
 const Management = ({ route }) => {
-	// const [{ unsaved, store, dimensions }, dispatch] = useStateValue();
+	const [{ unsaved, store, dimensions }, dispatch] = useStateValue();
 	const [product, setProduct] = useState({
 		name: '',
 		aisle: '',
 		note: '',
 	});
-	// const [pulling, setPulling] = useState(false);
-	// const [images, setImages] = useState(product.urls.map((url) => ({ url })));
-	// const [productImages, setProductImages] = useState(product.urls);
-	// const [viewImage, setViewImage] = useState(false);
+	const [pulling, setPulling] = useState(false);
+	const [images, setImages] = useState([]);
+	const [productImage, setProductImage] = useState('');
+	const [viewImage, setViewImage] = useState(false);
 	const [visible, setVisible] = useState({
 		status: false,
 		message: '',
@@ -38,14 +39,17 @@ const Management = ({ route }) => {
 	// 	});
 	// };
 
-	// const handleFindImage = async () => {
-	// 	setPulling(true);
-	// 	const response = await axios.get(pageCrawler(store.name, product.productName));
-	// 	if (response.data?.urls) {
-	// 		setImages(response.data.urls.map((url) => ({ url: url.replace('197x', '697x') })));
-	// 	}
-	// 	setPulling(false);
-	// };
+	const handleFindImage = async () => {
+		if (!product.name) return;
+
+		setPulling(true);
+		const response = await axios.get(pageCrawler(store.name, product.name));
+		if (response.data?.urls) {
+			setImages(response.data.urls);
+		}
+
+		setPulling(false);
+	};
 
 	// const handleSelectedImage = (imgIndex) => {
 	// 	if (productImages.includes(images[imgIndex].url)) {
@@ -67,12 +71,12 @@ const Management = ({ route }) => {
 	return (
 		<KeyboardAwareScrollView>
 			<View style={{ backgroundColor: 'white', paddingHorizontal: 20 }}>
-				{/* <View style={{ height: 200, justifyContent: 'center' }}>
+				<View style={{ height: 200, justifyContent: 'center' }}>
 					{pulling ? (
 						<ActivityIndicator style={{ alignSelf: 'center', height: 200 }} />
 					) : images.length > 0 ? (
 						<TouchableWithoutFeedback onPress={() => setViewImage(true)}>
-							<Image style={{ alignSelf: 'center', height: 180, width: 180 }} source={{ uri: images[0].url }} />
+							<Image style={{ alignSelf: 'center', height: 180, width: 180 }} source={{ uri: images[0] }} />
 						</TouchableWithoutFeedback>
 					) : (
 						<Image
@@ -80,7 +84,7 @@ const Management = ({ route }) => {
 							source={require('../../../../assets/camera/noImage.png')}
 						/>
 					)}
-				</View> */}
+				</View>
 				<TextInput
 					multiline
 					style={styles.input}
@@ -100,8 +104,8 @@ const Management = ({ route }) => {
 				/>
 
 				<TextInput
-					style={[styles.input]}
-					mode='flat'
+					style={styles.input}
+					mode='outlined'
 					multiline
 					dense
 					label='Note'
@@ -110,13 +114,14 @@ const Management = ({ route }) => {
 				/>
 
 				<Button
+					disabled={product.name ? false : true}
 					labelStyle={{ textTransform: 'capitalize', alignSelf: 'center', flex: 1 }}
 					style={{
 						marginTop: 10,
 						padding: 5,
 					}}
 					mode='contained'
-					// onPress={handleFindImage}
+					onPress={handleFindImage}
 				>
 					Find Image
 				</Button>
@@ -133,6 +138,26 @@ const Management = ({ route }) => {
 					Save
 				</Button>
 			</View>
+			<Modal visible={viewImage} transparent={true} onRequestClose={() => setViewImage(false)}>
+				<ImageViewer
+					imageUrls={images.length > 0 ? images.map((url) => ({ url })) : []}
+					onSwipeDown={() => setViewImage(false)}
+					enableSwipeDown
+					backgroundColor='white'
+					renderFooter={(index) => (
+						<Button
+							labelStyle={{ textTransform: 'capitalize', width: dimensions.width }}
+							style={{
+								marginTop: 10,
+								padding: 5,
+							}}
+							mode='contained'
+						>
+							Select
+						</Button>
+					)}
+				/>
+			</Modal>
 			<Snackbar controller={visible} setVisible={() => setVisible({ status: false, message: '' })} />
 		</KeyboardAwareScrollView>
 	);
@@ -144,7 +169,7 @@ const styles = StyleSheet.create({
 		backgroundColor: '#fff',
 	},
 	input: {
-		marginTop: 5,
+		marginTop: 10,
 	},
 });
 export default Management;

@@ -53,7 +53,15 @@ const SearchStore = ({ navigation }) => {
 
 	return (
 		<View style={styles.container}>
-			<TextInput style={{ marginBottom: 10 }} mode='outlined' placeholder='Enter ZIP, city, or store number...' />
+			<View style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }}>
+				<TextInput
+					style={{ marginBottom: 10, flex: 1 }}
+					mode='outlined'
+					placeholder='Enter ZIP, city, or store number...'
+				/>
+				<IconButton icon='plus' size={30} onPress={() => navigation.navigate('AddStore')} />
+			</View>
+
 			<FlatList
 				showsHorizontalScrollIndicator={true}
 				data={stores}

@@ -75,10 +75,10 @@ const AddStore = ({ navigation }) => {
 					style={{ marginVertical: 5 }}
 					mode='outlined'
 					label='Has aisle helper?'
-					placeholder='True or false'
+					placeholder='True or False'
 					value={store.hasAisleHelper}
 					onChangeText={(hasAisleHelper) =>
-						setStore({ ...store, hasAisleHelper: hasAisleHelper.toLowerCase() === 'true' })
+						setStore({ ...store, hasAisleHelper: hasAisleHelper.toLowerCase() === 'True' })
 					}
 				/>
 
