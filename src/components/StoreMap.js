@@ -35,13 +35,7 @@ const StoreMap = ({ store, product, handleLocation, isForm }) => {
 					backgroundColor: 'lightgray',
 				}}
 			>
-				<SvgUri
-					uri={
-						product?.aisleType
-							? `https://quickspree.s3-us-west-1.amazonaws.com/svg/store/${store.name}-${store.storeNumber}/${product.aisleType}.svg`
-							: `https://quickspree.s3-us-west-1.amazonaws.com/svg/default.svg`
-					}
-				/>
+				<SvgUri uri={`https://quickspree.s3-us-west-1.amazonaws.com/svg/doubleVertical.svg`} />
 
 				<>
 					{isForm && (

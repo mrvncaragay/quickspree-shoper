@@ -10,7 +10,7 @@ const Header = ({ store, colors, navigation }) => {
 			<View style={{ flexDirection: 'row', alignItems: 'center' }}>
 				<MaterialCommunityIcons name='store' size={36} color={colors.primary} />
 				<View style={{ marginLeft: 5 }}>
-					<Text style={{ fontSize: 14 }}>{`${store.name} - #${store.storeNumber}`}</Text>
+					<Text style={{ fontSize: 14 }}>{`${store.name} - ${store.storeNumber}`}</Text>
 					<Text style={{ fontSize: 12, color: 'gray' }}>{`${store.city}, ${store.state}`}</Text>
 				</View>
 			</View>

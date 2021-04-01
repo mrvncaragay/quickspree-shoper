@@ -19,7 +19,7 @@ const Store = ({ store, navigation }) => {
 		>
 			<Surface style={styles.store}>
 				<View>
-					<Text>{`${store.name} - #${store.storeNumber}`}</Text>
+					<Text>{`${store.name} - ${store.storeNumber}`}</Text>
 					<Text style={{ color: 'gray' }}>{`${store.city}, ${store.state}`}</Text>
 				</View>
 
