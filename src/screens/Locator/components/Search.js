@@ -1,14 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, FlatList } from 'react-native';
-import { TextInput, Divider } from 'react-native-paper';
+import { TextInput, Divider, Paragraph, Title, Subheading } from 'react-native-paper';
 import { useStateValue } from '../../../context';
 import firebase from '../../../firebase';
-import { ListItem } from '../../../components';
+import { ListItem, StoreMap } from '../../../components';
 
 const Search = () => {
 	const [{ store, lists }] = useStateValue();
 	const [_, dispatch] = useStateValue();
 	const [query, setQuery] = useState('');
+	const [listView, setListView] = useState();
+	const [view, setView] = useState(false);
 
 	useEffect(() => {
 		const storeProductsRef = firebase.database().ref(`products/${store.name.toLowerCase()}`);
@@ -30,12 +32,13 @@ const Search = () => {
 
 	return (
 		<View style={{ flex: 1 }}>
-			<TextInput placeholder='Search...' dense value={query} onChangeText={(q) => setQuery(q)} />
+			<TextInput style={{ paddingLeft: 10 }} placeholder='Search...' value={query} onChangeText={(q) => setQuery(q)} />
 			{query.length > 0 && (
 				<View
 					style={{
+						paddingLeft: 10,
 						position: 'absolute',
-						top: 40,
+						top: 63,
 						width: '100%',
 						backgroundColor: '#fff',
 						borderWidth: 1,
@@ -46,17 +49,35 @@ const Search = () => {
 				>
 					<FlatList
 						showsHorizontalScrollIndicator={true}
-						data={lists.filter((p) => p.name.includes(query.toLowerCase()))}
-						renderItem={({ item }) => <ListItem list={item} />}
+						data={lists.filter((p) => p.name.toLowerCase().includes(query.toLowerCase()))}
+						renderItem={({ item }) => (
+							<ListItem
+								list={item}
+								onPress={() => {
+									setListView(item);
+									setView(true);
+									setQuery('');
+								}}
+							/>
+						)}
 						keyExtractor={(item, i) => i.toString()}
 						ItemSeparatorComponent={() => <Divider />}
 					/>
 				</View>
 			)}
 
-			<View>
-				<Text>Profile Searched</Text>
-			</View>
+			{view && (
+				<>
+					<StoreMap list={listView} />
+					<View style={{ padding: 20 }}>
+						<View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 50 }}>
+							<Title style={{ flex: 1 }}>{listView.name}</Title>
+							<Subheading style={{ fontWeight: 'bold' }}>{listView.aisle}</Subheading>
+						</View>
+						<Paragraph style={{ alignSelf: 'flex-end' }}>{listView.note}</Paragraph>
+					</View>
+				</>
+			)}
 		</View>
 	);
 };

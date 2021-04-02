@@ -5,7 +5,7 @@ import { SvgUri, Rect } from 'react-native-svg';
 import SvgPanZoom, { SvgPanZoomElement } from 'react-native-svg-pan-zoom';
 import Marker from './Marker';
 
-const StoreMap = ({ store, product, handleLocation, isForm }) => {
+const StoreMap = ({ list, handleLocation, isForm }) => {
 	const { width } = Dimensions.get('screen');
 	const { colors } = useTheme();
 
@@ -44,7 +44,7 @@ const StoreMap = ({ store, product, handleLocation, isForm }) => {
 						</SvgPanZoomElement>
 					)}
 
-					{product && <Marker x={product.location.x} y={product.location.y} color={colors.primary} />}
+					{list && <Marker x={list.location.x} y={list.location.y} color={colors.primary} />}
 				</>
 			</SvgPanZoom>
 		</View>

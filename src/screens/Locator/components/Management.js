@@ -50,7 +50,7 @@ const Management = ({ route }) => {
 	return (
 		<KeyboardAwareScrollView>
 			<View style={{ backgroundColor: 'white' }}>
-				<StoreMap isForm handleLocation={handleLocation} product={product} />
+				<StoreMap isForm handleLocation={handleLocation} list={product} />
 
 				<View style={{ paddingHorizontal: 20, backgroundColor: '#fff' }}>
 					<TextInput
