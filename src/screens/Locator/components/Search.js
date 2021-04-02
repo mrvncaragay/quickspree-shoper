@@ -3,6 +3,7 @@ import { View, Text, FlatList } from 'react-native';
 import { TextInput, Divider } from 'react-native-paper';
 import { useStateValue } from '../../../context';
 import firebase from '../../../firebase';
+import { ListItem } from '../../../components';
 
 const Search = () => {
 	const [{ store, lists }] = useStateValue();
@@ -18,7 +19,7 @@ const Search = () => {
 			for (let id in products) {
 				for (let city in products[id]) {
 					if (city === store.storeNumber) {
-						searchableState.push(id);
+						searchableState.push({ name: id, ...products[id][city] });
 					}
 				}
 			}
@@ -45,8 +46,8 @@ const Search = () => {
 				>
 					<FlatList
 						showsHorizontalScrollIndicator={true}
-						data={lists.filter((q) => q.includes(query.toLowerCase()))}
-						renderItem={({ item }) => <Text style={{ padding: 10 }}>{item}</Text>}
+						data={lists.filter((p) => p.name.includes(query.toLowerCase()))}
+						renderItem={({ item }) => <ListItem list={item} />}
 						keyExtractor={(item, i) => i.toString()}
 						ItemSeparatorComponent={() => <Divider />}
 					/>

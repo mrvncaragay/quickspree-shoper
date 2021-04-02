@@ -20,7 +20,7 @@ const Store = ({ store, navigation }) => {
 					for (let id in products) {
 						for (let city in products[id]) {
 							if (city === store.storeNumber) {
-								searchableState.push(id);
+								searchableState.push({ name: id, ...products[id][city] });
 							}
 						}
 					}

@@ -32,7 +32,7 @@ const Management = ({ route }) => {
 	};
 
 	const handleSave = async () => {
-		const productRef = firebase.database().ref(`products/${store.name.toLowerCase()}/${product.name.toLowerCase()}`);
+		const productRef = firebase.database().ref(`products/${store.name.toLowerCase()}/${product.name}`);
 		delete product.name;
 		productRef.child(`${store.storeNumber}`).set(product, async (error) => {
 			if (error) {
