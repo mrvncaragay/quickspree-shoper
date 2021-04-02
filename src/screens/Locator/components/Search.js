@@ -1,16 +1,14 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, FlatList } from 'react-native';
+import { View, FlatList } from 'react-native';
 import { TextInput, Divider, Paragraph, Title, Subheading } from 'react-native-paper';
 import { useStateValue } from '../../../context';
 import firebase from '../../../firebase';
 import { ListItem, StoreMap } from '../../../components';
 
 const Search = () => {
-	const [{ store, lists }] = useStateValue();
+	const [{ store, lists, list }] = useStateValue();
 	const [_, dispatch] = useStateValue();
 	const [query, setQuery] = useState('');
-	const [listView, setListView] = useState();
-	const [view, setView] = useState(false);
 
 	useEffect(() => {
 		const storeProductsRef = firebase.database().ref(`products/${store.name.toLowerCase()}`);
@@ -54,8 +52,7 @@ const Search = () => {
 							<ListItem
 								list={item}
 								onPress={() => {
-									setListView(item);
-									setView(true);
+									dispatch({ type: 'setList', value: item });
 									setQuery('');
 								}}
 							/>
@@ -66,15 +63,15 @@ const Search = () => {
 				</View>
 			)}
 
-			{view && (
+			{list && (
 				<>
-					<StoreMap list={listView} />
+					<StoreMap list={list} />
 					<View style={{ padding: 20 }}>
 						<View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 50 }}>
-							<Title style={{ flex: 1 }}>{listView.name}</Title>
-							<Subheading style={{ fontWeight: 'bold' }}>{listView.aisle}</Subheading>
+							<Title style={{ flex: 1 }}>{list.name}</Title>
+							<Subheading style={{ fontWeight: 'bold' }}>{list.aisle}</Subheading>
 						</View>
-						<Paragraph style={{ alignSelf: 'flex-end' }}>{listView.note}</Paragraph>
+						<Paragraph style={{ alignSelf: 'flex-end' }}>{list.note}</Paragraph>
 					</View>
 				</>
 			)}

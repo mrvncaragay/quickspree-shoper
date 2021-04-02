@@ -27,6 +27,7 @@ const Store = ({ store, navigation }) => {
 
 					dispatch({ type: 'setSearchableLists', value: searchableState });
 					dispatch({ type: 'setStore', value: store });
+					dispatch({ type: 'setList', value: undefined });
 					await storeData('store', store);
 					await storeData('lists', searchableState);
 					navigation.goBack();
