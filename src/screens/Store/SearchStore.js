@@ -12,9 +12,25 @@ const Store = ({ store, navigation }) => {
 	return (
 		<TouchableRipple
 			onPress={() => {
-				dispatch({ type: 'setStore', value: store });
-				storeData('store', store);
-				navigation.goBack();
+				const storeProductsRef = firebase.database().ref(`products/${store.name.toLowerCase()}`);
+				storeProductsRef.once('value', async (snapshot) => {
+					const products = snapshot.val();
+					const searchableState = [];
+
+					for (let id in products) {
+						for (let city in products[id]) {
+							if (city === store.storeNumber) {
+								searchableState.push(id);
+							}
+						}
+					}
+
+					dispatch({ type: 'setSearchableLists', value: searchableState });
+					dispatch({ type: 'setStore', value: store });
+					await storeData('store', store);
+					await storeData('lists', searchableState);
+					navigation.goBack();
+				});
 			}}
 		>
 			<Surface style={styles.store}>
@@ -23,12 +39,7 @@ const Store = ({ store, navigation }) => {
 					<Text style={{ color: 'gray' }}>{`${store.city}, ${store.state}`}</Text>
 				</View>
 
-				<IconButton
-					icon='chevron-right'
-					color={colors.primary}
-					size={24}
-					onPress={() => navigation.navigate('SearchStore')}
-				/>
+				<IconButton icon='chevron-right' color={colors.primary} size={24} />
 			</Surface>
 		</TouchableRipple>
 	);

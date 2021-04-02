@@ -1,10 +1,31 @@
-import React, { useState } from 'react';
-import { View, StyleSheet, Text, FlatList } from 'react-native';
-import { useTheme, TextInput, Divider } from 'react-native-paper';
+import React, { useState, useEffect } from 'react';
+import { View, Text, FlatList } from 'react-native';
+import { TextInput, Divider } from 'react-native-paper';
+import { useStateValue } from '../../../context';
+import firebase from '../../../firebase';
 
-const Search = ({ navigation }) => {
-	const { colors } = useTheme();
+const Search = () => {
+	const [{ store, lists }] = useStateValue();
+	const [_, dispatch] = useStateValue();
 	const [query, setQuery] = useState('');
+
+	useEffect(() => {
+		const storeProductsRef = firebase.database().ref(`products/${store.name.toLowerCase()}`);
+		storeProductsRef.on('value', async (snapshot) => {
+			const products = snapshot.val();
+			const searchableState = [];
+
+			for (let id in products) {
+				for (let city in products[id]) {
+					if (city === store.storeNumber) {
+						searchableState.push(id);
+					}
+				}
+			}
+
+			dispatch({ type: 'setSearchableLists', value: searchableState });
+		});
+	}, []);
 
 	return (
 		<View style={{ flex: 1 }}>
@@ -24,7 +45,7 @@ const Search = ({ navigation }) => {
 				>
 					<FlatList
 						showsHorizontalScrollIndicator={true}
-						data={['Produce', 'Deli', 'Spices', 'Grocery', 'Bakery']}
+						data={lists.filter((q) => q.includes(query.toLowerCase()))}
 						renderItem={({ item }) => <Text style={{ padding: 10 }}>{item}</Text>}
 						keyExtractor={(item, i) => i.toString()}
 						ItemSeparatorComponent={() => <Divider />}
@@ -38,15 +59,5 @@ const Search = ({ navigation }) => {
 		</View>
 	);
 };
-
-const styles = StyleSheet.create({
-	container: {
-		flex: 1,
-		backgroundColor: '#fff',
-	},
-	input: {
-		marginTop: 5,
-	},
-});
 
 export default Search;
