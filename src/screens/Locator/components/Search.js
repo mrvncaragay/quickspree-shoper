@@ -30,7 +30,12 @@ const Search = () => {
 
 	return (
 		<View style={{ flex: 1 }}>
-			<TextInput style={{ paddingLeft: 10 }} placeholder='Search...' value={query} onChangeText={(q) => setQuery(q)} />
+			<TextInput
+				style={{ paddingLeft: 10, backgroundColor: '#fff' }}
+				placeholder='Search...'
+				value={query}
+				onChangeText={(q) => setQuery(q)}
+			/>
 			{query.length > 0 && (
 				<View
 					style={{

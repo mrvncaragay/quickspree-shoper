@@ -7,26 +7,6 @@ export const StateReducer = (state, action) => {
 				...state,
 				store: action.value,
 			};
-		case 'setBatch':
-			return {
-				...state,
-				batch: action.value,
-			};
-		case 'setDone':
-			return {
-				...state,
-				done: action.value,
-			};
-		case 'setReplacement':
-			return {
-				...state,
-				replacement: action.value,
-			};
-		case 'setScanned':
-			return {
-				...state,
-				scanned: action.value,
-			};
 		case 'setSearchableLists':
 			return {
 				...state,
@@ -50,10 +30,6 @@ export const StateReducer = (state, action) => {
 
 export const InitialState = {
 	store: null,
-	batch: [],
-	done: [],
-	replacement: [],
-	scanned: [],
 	lists: [],
 	list: undefined,
 	dimensions: {
