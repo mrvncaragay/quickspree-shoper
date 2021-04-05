@@ -56,6 +56,7 @@ const Store = ({ store, navigation }) => {
 
 const SearchStore = ({ navigation }) => {
 	const [stores, setStores] = useState([]);
+	const [query, setQuery] = useState('');
 
 	useEffect(() => {
 		const citiesRef = firebase.database().ref('stores');
@@ -75,16 +76,19 @@ const SearchStore = ({ navigation }) => {
 		<View style={styles.container}>
 			<View style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }}>
 				<TextInput
+					dense
 					style={{ marginBottom: 10, flex: 1 }}
 					mode='outlined'
-					placeholder='Enter ZIP, city, or store number...'
+					placeholder='Store name...'
+					value={query}
+					onChangeText={(q) => setQuery(q)}
 				/>
 				<IconButton icon='plus' size={30} onPress={() => navigation.navigate('AddStore')} />
 			</View>
 
 			<FlatList
 				showsHorizontalScrollIndicator={true}
-				data={stores}
+				data={stores.filter((s) => s.name.toLowerCase().includes(query.toLowerCase()))}
 				initialNumToRender={6}
 				windowSize={3}
 				renderItem={({ item, index }) => <Store navigation={navigation} store={item} />}
