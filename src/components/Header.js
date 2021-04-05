@@ -1,14 +1,20 @@
 import React from 'react';
 import { View, StyleSheet } from 'react-native';
-import { Surface, Text } from 'react-native-paper';
-import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import { Surface, Text, Avatar } from 'react-native-paper';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
+import storeUrls from '../utils/storeUrls';
 
 const Header = ({ store, colors, navigation }) => {
 	return (
 		<Surface style={styles.surface}>
 			<View style={{ flexDirection: 'row', alignItems: 'center' }}>
-				<MaterialCommunityIcons name='store' size={36} color={colors.primary} />
+				<Avatar.Image
+					size={38}
+					style={{ backgroundColor: '#fff' }}
+					source={{
+						uri: storeUrls[store.name.toLowerCase()],
+					}}
+				/>
 				<View style={{ marginLeft: 5 }}>
 					<Text style={{ fontSize: 14 }}>{`${store.name} - ${store.storeNumber}`}</Text>
 					<Text style={{ fontSize: 12, color: 'gray' }}>{`${store.city}, ${store.state}`}</Text>
