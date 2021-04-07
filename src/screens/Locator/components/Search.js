@@ -4,8 +4,9 @@ import { TextInput, Divider, Paragraph, Title, Subheading } from 'react-native-p
 import { useStateValue } from '../../../context';
 import firebase from '../../../firebase';
 import { ListItem, StoreMap } from '../../../components';
+import defaultList from '../../../utils/predefinedList';
 
-const Search = () => {
+const Search = ({ navigation }) => {
 	const [{ store, lists, list }] = useStateValue();
 	const [_, dispatch] = useStateValue();
 	const [query, setQuery] = useState('');
@@ -19,9 +20,16 @@ const Search = () => {
 			for (let id in products) {
 				for (let city in products[id]) {
 					if (city === store.storeNumber) {
+						if (defaultList[id]) {
+							delete defaultList[id];
+						}
 						searchableState.push({ name: id, ...products[id][city] });
 					}
 				}
+			}
+
+			for (let key in defaultList) {
+				searchableState.push({ name: key });
 			}
 
 			dispatch({ type: 'setSearchableLists', value: searchableState });
@@ -33,6 +41,7 @@ const Search = () => {
 			<TextInput
 				style={{ paddingLeft: 10, backgroundColor: '#fff' }}
 				placeholder='Search...'
+				denseß
 				value={query}
 				onChangeText={(q) => setQuery(q)}
 			/>
@@ -57,7 +66,12 @@ const Search = () => {
 							<ListItem
 								list={item}
 								onPress={() => {
-									dispatch({ type: 'setList', value: item });
+									if (!item.aisle) {
+										navigation.navigate('Management', { unlisted: item });
+									} else {
+										dispatch({ type: 'setList', value: item });
+									}
+
 									setQuery('');
 								}}
 							/>

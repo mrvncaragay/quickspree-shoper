@@ -21,7 +21,9 @@ const defaultProduct = {
 
 const Management = ({ route }) => {
 	const [{ store }] = useStateValue();
-	const [product, setProduct] = useState(defaultProduct);
+	const [product, setProduct] = useState(
+		route.params?.unlisted ? { ...defaultProduct, name: route.params.unlisted.name } : defaultProduct,
+	);
 	const [visible, setVisible] = useState({
 		status: false,
 		message: '',

@@ -1,7 +1,7 @@
 import React from 'react';
 import { createMaterialBottomTabNavigator } from '@react-navigation/material-bottom-tabs';
 import { Fontisto, AntDesign } from '@expo/vector-icons';
-import { Locator } from '../screens';
+import { Locator, Management } from '../screens';
 
 const BottomTab = createMaterialBottomTabNavigator();
 
@@ -28,7 +28,7 @@ const BottomTabNavigator = () => {
 
 			<BottomTab.Screen
 				name='Management'
-				component={Locator}
+				component={Management}
 				options={{
 					tabBarIcon: ({ color }) => <AntDesign name='shoppingcart' size={22} color={color} style={{ width: 35 }} />,
 				}}

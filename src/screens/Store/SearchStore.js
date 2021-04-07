@@ -5,6 +5,7 @@ import { useStateValue } from '../../context';
 import { storeData } from '../../utils/asyncStorage';
 import firebase from '../../firebase';
 import storeUrls from '../../utils/storeUrls';
+import defaultList from '../../utils/predefinedList';
 
 const Store = ({ store, navigation }) => {
 	const [_, dispatch] = useStateValue();
@@ -21,9 +22,17 @@ const Store = ({ store, navigation }) => {
 					for (let id in products) {
 						for (let city in products[id]) {
 							if (city === store.storeNumber) {
+								if (defaultList[id]) {
+									delete defaultList[id];
+								}
+
 								searchableState.push({ name: id, ...products[id][city] });
 							}
 						}
+					}
+
+					for (let key in defaultList) {
+						searchableState.push({ name: key });
 					}
 
 					dispatch({ type: 'setSearchableLists', value: searchableState });

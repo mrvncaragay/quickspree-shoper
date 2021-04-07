@@ -5,9 +5,9 @@ import { Header as HeaderComponent, SelectStore } from '../../components';
 import { useStateValue } from '../../context';
 import { readData } from '../../utils/asyncStorage';
 
-import Search from './components/Search';
+import Management from './components/Management';
 
-const Shopper = ({ navigation }) => {
+const Shopper = ({ navigation, route }) => {
 	const [{ store }, dispatch] = useStateValue();
 	const { colors } = useTheme();
 
@@ -26,7 +26,7 @@ const Shopper = ({ navigation }) => {
 			{store ? (
 				<>
 					<HeaderComponent store={store} colors={colors} navigation={navigation} />
-					<Search navigation={navigation} />
+					<Management route={route} />
 				</>
 			) : (
 				<SelectStore colors={colors} navigationLocator={navigation} />
